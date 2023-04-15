@@ -1,61 +1,54 @@
 import torch
 from torch import nn
-from model import NeuralNetwork
-from dataset import train_dataloader, test_dataloader
 
-model = NeuralNetwork()
+class NeuralNetworkTrainer:
+    def __init__(self, model):
+        self.model = model
 
-learning_rate = 1e-3
-batch_size = 64
-epochs = 5
+    def train_loop(self, dataloader, loss_fn, optimizer):
+        size = len(dataloader.dataset)
+        for batch, (X, y) in enumerate(dataloader):
+            # Compute prediction and loss
+            pred = self.model(X)
+            loss = loss_fn(pred, y)
 
-def train_loop(dataloader, model, loss_fn, optimizer):
-    size = len(dataloader.dataset)
-    for batch, (X, y) in enumerate(dataloader):
-        # Compute prediction and loss
-        pred = model(X)
-        loss = loss_fn(pred, y)
+            # Backpropagation
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        # Backpropagation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            if batch % 100 == 0:
+                loss, current = loss.item(), batch * len(X)
+                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
-        if batch % 100 == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+    def test_loop(self, dataloader, loss_fn):
+        size = len(dataloader.dataset)
+        num_batches = len(dataloader)
+        test_loss, correct = 0, 0
 
+        with torch.no_grad():
+            for X, y in dataloader:
+                pred = self.model(X)
+                test_loss += loss_fn(pred, y).item()
+                correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
-def test_loop(dataloader, model, loss_fn):
-    size = len(dataloader.dataset)
-    num_batches = len(dataloader)
-    test_loss, correct = 0, 0
+        test_loss /= num_batches
+        correct /= size
+        print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
-    with torch.no_grad():
-        for X, y in dataloader:
-            pred = model(X)
-            test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+    def train_and_save(self, train_dataloader, test_dataloader, learning_rate=1e-3, batch_size=64, epochs=5, model_name='model.pth'):
+        loss_fn = nn.CrossEntropyLoss()
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=learning_rate)
 
-    test_loss /= num_batches
-    correct /= size
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+        for t in range(epochs):
+            print(f"Epoch {t+1}\n-------------------------------")
+            self.train_loop(train_dataloader, loss_fn, optimizer)
+            self.test_loop(test_dataloader, loss_fn)
+        print("Done!")
 
-def train_and_save(model_name = 'model.pth'):
-    loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+        torch.save(self.model, model_name)
 
-    epochs = 10
-    for t in range(epochs):
-        print(f"Epoch {t+1}\n-------------------------------")
-        train_loop(train_dataloader, model, loss_fn, optimizer)
-        test_loop(test_dataloader, model, loss_fn)
-    print("Done!")
-
-    torch.save(model, model_name)
-
-def load_model(model_name = 'model.pth'):
-    model = torch.load(model_name)
-    return model
-
-
+    @classmethod
+    def load_model(cls, model_name='model.pth'):
+        model = torch.load(model_name)
+        return cls(model)
