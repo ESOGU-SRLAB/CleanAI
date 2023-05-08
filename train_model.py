@@ -4,9 +4,6 @@ from torch import nn
 class NeuralNetworkTrainer:
     def __init__(self, model):
         self.model = model
-class NeuralNetworkTrainer:
-    def __init__(self, model):
-        self.model = model
 
     def train_loop(self, dataloader, loss_fn, optimizer):
         size = len(dataloader.dataset)
