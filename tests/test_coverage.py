@@ -212,3 +212,88 @@ print(
     f"Covered neurons: {covered_neurons}\nTotal neurons: {total_neurons}\nCoverage: {coverage}"
 )
 print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")
+print(f"TEST FN: get_value_coverage: \n")
+random_2_inputs = dataset.get_random_inputs(2)
+model_architecture_dicts_of_inputs_for_mini = (
+    NeuralNetworkProfiler.get_model_architecture_dicts_of_inputs(
+        random_2_inputs, model_layers_arr_for_mini
+    )
+)
+covered_neurons, total_neurons, coverage = Coverage.get_value_coverage(
+    model_architecture_dicts_of_inputs_for_mini[0],
+    model_architecture_dicts_of_inputs_for_mini[1],
+)
+print(
+    f"Covered neurons: {covered_neurons}\nTotal neurons: {total_neurons}\nCoverage: {coverage}"
+)
+print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")
+print(f"TEST FN: get_value_value_coverage: \n")
+random_2_inputs = dataset.get_random_inputs(2)
+model_architecture_dicts_of_inputs_for_mini = (
+    NeuralNetworkProfiler.get_model_architecture_dicts_of_inputs(
+        random_2_inputs, model_layers_arr_for_mini
+    )
+)
+covered_neurons, total_neurons, coverage = Coverage.get_value_value_coverage(
+    model_architecture_dicts_of_inputs_for_mini[0],
+    model_architecture_dicts_of_inputs_for_mini[1],
+)
+print(
+    f"Covered neurons: {covered_neurons}\nTotal neurons: {total_neurons}\nCoverage: {coverage}"
+)
+print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")
+print(f"TEST FN: get_sign_value_coverage: \n")
+random_2_inputs = dataset.get_random_inputs(2)
+model_architecture_dicts_of_inputs_for_mini = (
+    NeuralNetworkProfiler.get_model_architecture_dicts_of_inputs(
+        random_2_inputs, model_layers_arr_for_mini
+    )
+)
+covered_neurons, total_neurons, coverage = Coverage.get_sign_value_coverage(
+    model_architecture_dicts_of_inputs_for_mini[0],
+    model_architecture_dicts_of_inputs_for_mini[1],
+)
+print(
+    f"Covered neurons: {covered_neurons}\nTotal neurons: {total_neurons}\nCoverage: {coverage}"
+)
+print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")
+print(f"TEST FN: get_value_sing_coverage: \n")
+random_2_inputs = dataset.get_random_inputs(2)
+model_architecture_dicts_of_inputs_for_mini = (
+    NeuralNetworkProfiler.get_model_architecture_dicts_of_inputs(
+        random_2_inputs, model_layers_arr_for_mini
+    )
+)
+covered_neurons, total_neurons, coverage = Coverage.get_value_sign_coverage(
+    model_architecture_dicts_of_inputs_for_mini[0],
+    model_architecture_dicts_of_inputs_for_mini[1],
+)
+print(
+    f"Covered neurons: {covered_neurons}\nTotal neurons: {total_neurons}\nCoverage: {coverage}"
+)
+print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")
+
+print(f"TEST FN: TKNC: \n")
+random_2_inputs = dataset.get_random_inputs(2)
+model_architecture_dicts_of_inputs_for_mini = (
+    NeuralNetworkProfiler.get_model_architecture_dicts_of_inputs(
+        random_2_inputs, model_layers_arr_for_mini
+    )
+)
+tknc_value = Coverage.TKNC(
+    model_architecture_dicts_of_inputs_for_mini[0], 2
+)
+print(f"TKNC values for model {tknc_value}")
+print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")

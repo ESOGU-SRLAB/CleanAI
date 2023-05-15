@@ -201,6 +201,19 @@ class Coverage:
                 total_neurons = total_neurons + 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
+    
+    @staticmethod
+    def get_value_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        covered_neurons = 0
+        total_neurons = 0
+        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index
+            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
+            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
+                if(CoverageUtils.is_there_value_change(k, neuron_index, 
+                                            model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
+                    covered_neurons = covered_neurons + 1
+                total_neurons = total_neurons + 1
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
     def get_sign_sign_coverage(
@@ -246,3 +259,67 @@ class Coverage:
                     total_neurons = total_neurons + 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
+    @staticmethod
+    def TKNC(model_architecture_dict, top_k):
+        tknc_sum = 0
+        for k in range(len(model_architecture_dict)): # K => layer
+            neuron_values = model_architecture_dict[str(k)]["after_act_func_values"][0]
+            sorted_neuron_values, indices = torch.sort(neuron_values, descending=True)
+            sorted_top_k = sorted_neuron_values[:top_k]
+            sum_top_k = torch.sum(sorted_top_k)
+            tknc_sum = sum_top_k + tknc_sum
+        mean_top_k = tknc_sum / (top_k * len(model_architecture_dict))
+        return mean_top_k
+    
+    @staticmethod
+    def get_value_value_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        covered_neurons = 0
+        total_neurons = 0
+
+        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index, looping on the first test input
+            if k == len(model_architecture_dict_for_tI) - 1: #check if the two test input are in the same index 
+                break
+            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
+            after_act_fn_values_for_consecutive_layer = model_architecture_dict_for_tI[str(k + 1)]["after_act_func_values"][0]
+            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
+                for neuron_index_for_consecutive_layer in range(len(after_act_fn_values_for_consecutive_layer)): # neuron_index_for_consecutive_layer specifies the j value
+                    if(CoverageUtils.is_there_value_value_change(k, neuron_index, neuron_index_for_consecutive_layer, 
+                                                model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
+                        covered_neurons = covered_neurons + 1
+                    total_neurons = total_neurons + 1
+
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
+    @staticmethod
+    def get_sign_value_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        covered_neurons = 0
+        total_neurons = 0
+
+        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index, looping on the first test input
+            if k == len(model_architecture_dict_for_tI) - 1: #check if the two test input are in the same index 
+                break
+            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
+            after_act_fn_values_for_consecutive_layer = model_architecture_dict_for_tI[str(k + 1)]["after_act_func_values"][0]
+            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
+                for neuron_index_for_consecutive_layer in range(len(after_act_fn_values_for_consecutive_layer)): # neuron_index_for_consecutive_layer specifies the j value
+                    if(CoverageUtils.is_there_sign_value_change(k, neuron_index, neuron_index_for_consecutive_layer, 
+                                                model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
+                        covered_neurons = covered_neurons + 1
+                    total_neurons = total_neurons + 1
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
+    @staticmethod
+    def get_value_sign_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        covered_neurons = 0
+        total_neurons = 0
+        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index, looping on the first test input
+            if k == len(model_architecture_dict_for_tI) - 1: #check if the two test input are in the same index 
+                break
+            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
+            after_act_fn_values_for_consecutive_layer = model_architecture_dict_for_tI[str(k + 1)]["after_act_func_values"][0]
+            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
+                for neuron_index_for_consecutive_layer in range(len(after_act_fn_values_for_consecutive_layer)): # neuron_index_for_consecutive_layer specifies the j value
+                    if(CoverageUtils.is_there_value_sign_change(k, neuron_index, neuron_index_for_consecutive_layer, 
+                                                model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
+                        covered_neurons = covered_neurons + 1
+                    total_neurons = total_neurons + 1
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
+
