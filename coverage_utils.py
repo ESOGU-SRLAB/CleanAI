@@ -1,3 +1,8 @@
+from math import inf
+import torch
+import tensorflow as tf
+
+
 class CoverageUtils:
     @staticmethod
     def is_there_sign_change(
@@ -49,10 +54,21 @@ class CoverageUtils:
             flag = False
 
         return flag
+
     @staticmethod
-    def is_there_value_change(k, i, model_architecture_dict_for_tI, model_architecture_dict_for_tII, threshold_value = 0.05):
-        neuron_value_for_tI = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0][i]
-        neuron_value_for_tII = model_architecture_dict_for_tII[str(k)]["after_act_func_values"][0][i]
+    def is_there_value_change(
+        k,
+        i,
+        model_architecture_dict_for_tI,
+        model_architecture_dict_for_tII,
+        threshold_value=0.05,
+    ):
+        neuron_value_for_tI = model_architecture_dict_for_tI[str(k)][
+            "after_act_func_values"
+        ][0][i]
+        neuron_value_for_tII = model_architecture_dict_for_tII[str(k)][
+            "after_act_func_values"
+        ][0][i]
 
         if abs(neuron_value_for_tI - neuron_value_for_tII) > threshold_value:
             return True
@@ -60,57 +76,157 @@ class CoverageUtils:
             return False
 
     @staticmethod
-    def is_there_value_value_change(k, i, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII) -> bool:
+    def is_there_value_value_change(
+        k, i, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
         flag = True
-        for neuron_index in range(len(model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0])):
+
+        for neuron_index in range(
+            len(model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0])
+        ):
             if i == neuron_index:
-                if not CoverageUtils.is_there_value_change(k, i, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+                if not CoverageUtils.is_there_value_change(
+                    k,
+                    i,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     flag = False
                     break
             else:
-                if CoverageUtils.is_there_sign_change(k, neuron_index, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+                if CoverageUtils.is_there_sign_change(
+                    k,
+                    neuron_index,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     flag = False
                     break
-        if not CoverageUtils.is_there_value_change(k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
-                flag = False
-        if CoverageUtils.is_there_sign_change(k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        if not CoverageUtils.is_there_value_change(
+            k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+        ):
             flag = False
+        if CoverageUtils.is_there_sign_change(
+            k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+        ):
+            flag = False
+
         return flag
-    
-    
+
     @staticmethod
-    def is_there_sign_value_change(k, i, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII) -> bool:
+    def is_there_sign_value_change(
+        k, i, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
         flag = True
-        for neuron_index in range(len(model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0])):
+
+        for neuron_index in range(
+            len(model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0])
+        ):
             if i == neuron_index:
-                if not CoverageUtils.is_there_sign_change(k, i, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+                if not CoverageUtils.is_there_sign_change(
+                    k,
+                    i,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     flag = False
                     break
             else:
-                if CoverageUtils.is_there_sign_change(k, neuron_index, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+                if CoverageUtils.is_there_sign_change(
+                    k,
+                    neuron_index,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     flag = False
                     break
 
-        if not CoverageUtils.is_there_value_change(k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        if not CoverageUtils.is_there_value_change(
+            k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+        ):
             flag = False
 
-        if CoverageUtils.is_there_sign_change(k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        if CoverageUtils.is_there_sign_change(
+            k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+        ):
             flag = False
-        
+
         return flag
+
     @staticmethod
-    def is_there_value_sign_change(k, i, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII) -> bool:
+    def is_there_value_sign_change(
+        k, i, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
         flag = True
-        for neuron_index in range(len(model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0])):
+
+        for neuron_index in range(
+            len(model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0])
+        ):
             if i == neuron_index:
-                if not CoverageUtils.is_there_value_change(k, i, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+                if not CoverageUtils.is_there_value_change(
+                    k,
+                    i,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     flag = False
                     break
             else:
-                if CoverageUtils.is_there_sign_change(k, neuron_index, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+                if CoverageUtils.is_there_sign_change(
+                    k,
+                    neuron_index,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     flag = False
                     break
 
-        if not CoverageUtils.is_there_sign_change(k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+        if not CoverageUtils.is_there_sign_change(
+            k + 1, j, model_architecture_dict_for_tI, model_architecture_dict_for_tII
+        ):
             flag = False
+
         return flag
+
+    @staticmethod
+    # Definition of fn: This function accepts the layer values and the layer index created
+    # as a result of the input values given as parameters. The function finds the minimum
+    # and maximum neuron value of the relevant layer in the given layer index for each
+    # input value. As a result, the function presents the maximum and minimum neuron values
+    # of the layers related (specific, in the layer index specified as a parameter) to the
+    # user as a result of each input value.
+    def calc_bounds(model_architecture_dicts, layer_idx):
+        min = inf
+        max = -inf
+
+        for model_architecture_dict in model_architecture_dicts:
+            torch_min = torch.min(
+                model_architecture_dict[str(layer_idx)]["after_act_func_values"][0]
+            )
+            torch_max = torch.max(
+                model_architecture_dict[str(layer_idx)]["after_act_func_values"][0]
+            )
+
+            torch_min = torch_min.item()
+            torch_max = torch_max.item()
+
+            min = min if min < torch_min else torch_min
+            max = max if max > torch_max else torch_max
+
+        return min, max
+
+    @staticmethod
+    # Definition of fn: This function navigates between the layer values of the input
+    # values given as parameters and returns the minimum and maximum neuron values for
+    # each layer.
+    def get_bounds_for_layers(model_architecture_dicts):
+        bound_dict = {}
+
+        for layer_idx in range(len(model_architecture_dicts[0])):
+            min_bound_of_layer, max_bound_of_layer = CoverageUtils.calc_bounds(
+                model_architecture_dicts, layer_idx
+            )
+            prop = {"min_bound": min_bound_of_layer, "max_bound": max_bound_of_layer}
+            bound_dict[str(layer_idx)] = prop
+
+        return bound_dict

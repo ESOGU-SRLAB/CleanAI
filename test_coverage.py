@@ -2,11 +2,12 @@ from model_architecture_utils import ModelArchitectureUtils
 from neural_network_profiler import NeuralNetworkProfiler
 from torchvision.datasets import FashionMNIST
 from torchvision.transforms import ToTensor
+from math import inf
 from coverage import Coverage
+from coverage_utils import CoverageUtils
 from model import load_model
 from dataset import Dataset
 from mini_model import load_mini_model
-from math import inf
 
 training_data = FashionMNIST(
     root="data", train=True, download=True, transform=ToTensor()
@@ -282,7 +283,6 @@ print(
 print(f"---------------------------------------\n")
 
 print(f"---------------------------------------\n")
-
 print(f"TEST FN: TKNC: \n")
 random_2_inputs = dataset.get_random_inputs(2)
 model_architecture_dicts_of_inputs_for_mini = (
@@ -290,10 +290,44 @@ model_architecture_dicts_of_inputs_for_mini = (
         random_2_inputs, model_layers_arr_for_mini
     )
 )
-tknc_value = Coverage.TKNC(
-    model_architecture_dicts_of_inputs_for_mini[0], 2
-)
+tknc_value = Coverage.TKNC(model_architecture_dicts_of_inputs_for_mini[0], 2)
 print(f"TKNC values for model {tknc_value}")
 print(f"---------------------------------------\n")
 
+print(f"---------------------------------------\n")
+print(f"TEST FN: NBC: \n")
+random_50_inputs = dataset.get_random_inputs(50)
+rand_input = dataset.get_random_input()
+model_architecture_dict_of_input = (
+    NeuralNetworkProfiler.get_model_architecture_dict_of_input(
+        rand_input, model_layers_arr
+    )
+)
+model_architecture_dicts_of_inputs = (
+    NeuralNetworkProfiler.get_model_architecture_dicts_of_inputs(
+        random_50_inputs, model_layers_arr
+    )
+)
+bound_dict = CoverageUtils.get_bounds_for_layers(model_architecture_dicts_of_inputs)
+nbc_counter, total_neurons, nbc_coverege = Coverage.NBC(
+    model_architecture_dict_of_input, bound_dict
+)
+print(
+    f"NBC counter: {nbc_counter}\nTotal neurons: {total_neurons}\nNBC coverage: {nbc_coverege}"
+)
+print(f"---------------------------------------\n")
+
+print(f"---------------------------------------\n")
+print(f"TEST FN: MBC: \n")
+node_intervals = [(-0.35, 0.35), (0.35, 0.55)]
+rand_input = dataset.get_random_input()
+model_architecture_dict_of_input_for_mini = (
+    NeuralNetworkProfiler.get_model_architecture_dict_of_input(
+        rand_input, model_layers_arr_for_mini
+    )
+)
+
+result_mnc = Coverage.MNC(node_intervals, model_architecture_dict_of_input_for_mini)
+
+print(f"MNC result percentages: {result_mnc}")
 print(f"---------------------------------------\n")

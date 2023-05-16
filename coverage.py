@@ -201,18 +201,36 @@ class Coverage:
                 total_neurons = total_neurons + 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
-    
+
     @staticmethod
-    def get_value_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
+    def get_value_coverage(
+        model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
         covered_neurons = 0
         total_neurons = 0
-        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index
-            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
-            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
-                if(CoverageUtils.is_there_value_change(k, neuron_index, 
-                                            model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
+
+        for k in range(
+            len(model_architecture_dict_for_tI)
+        ):  # k specifies the layer index
+            after_act_fn_values = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k
+                )[0]
+            )
+
+            for neuron_index in range(
+                len(after_act_fn_values)
+            ):  # neuron_index specifies the i value
+                if CoverageUtils.is_there_value_change(
+                    k,
+                    neuron_index,
+                    model_architecture_dict_for_tI,
+                    model_architecture_dict_for_tII,
+                ):
                     covered_neurons = covered_neurons + 1
+
                 total_neurons = total_neurons + 1
+
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
@@ -259,67 +277,237 @@ class Coverage:
                     total_neurons = total_neurons + 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
+
     @staticmethod
+    def get_value_value_coverage(
+        model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
+        covered_neurons = 0
+        total_neurons = 0
+
+        for k in range(
+            len(model_architecture_dict_for_tI)
+        ):  # k specifies the layer index, looping on the first test input
+            if (
+                k == len(model_architecture_dict_for_tI) - 1
+            ):  # check if the two test input are in the same index
+                break
+
+            after_act_fn_values = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k
+                )[0]
+            )
+            after_act_fn_values_for_consecutive_layer = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k + 1
+                )[0]
+            )
+
+            for neuron_index in range(
+                len(after_act_fn_values)
+            ):  # neuron_index specifies the i value
+                for neuron_index_for_consecutive_layer in range(
+                    len(after_act_fn_values_for_consecutive_layer)
+                ):  # neuron_index_for_consecutive_layer specifies the j value
+                    if CoverageUtils.is_there_value_value_change(
+                        k,
+                        neuron_index,
+                        neuron_index_for_consecutive_layer,
+                        model_architecture_dict_for_tI,
+                        model_architecture_dict_for_tII,
+                    ):
+                        covered_neurons = covered_neurons + 1
+                    total_neurons = total_neurons + 1
+
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
+
+    @staticmethod
+    def get_sign_value_coverage(
+        model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
+        covered_neurons = 0
+        total_neurons = 0
+
+        for k in range(
+            len(model_architecture_dict_for_tI)
+        ):  # k specifies the layer index, looping on the first test input
+            if (
+                k == len(model_architecture_dict_for_tI) - 1
+            ):  # check if the two test input are in the same index
+                break
+
+            after_act_fn_values = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k
+                )[0]
+            )
+            after_act_fn_values_for_consecutive_layer = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k + 1
+                )[0]
+            )
+
+            for neuron_index in range(
+                len(after_act_fn_values)
+            ):  # neuron_index specifies the i value
+                for neuron_index_for_consecutive_layer in range(
+                    len(after_act_fn_values_for_consecutive_layer)
+                ):  # neuron_index_for_consecutive_layer specifies the j value
+                    if CoverageUtils.is_there_sign_value_change(
+                        k,
+                        neuron_index,
+                        neuron_index_for_consecutive_layer,
+                        model_architecture_dict_for_tI,
+                        model_architecture_dict_for_tII,
+                    ):
+                        covered_neurons = covered_neurons + 1
+                    total_neurons = total_neurons + 1
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
+
+    @staticmethod
+    def get_value_sign_coverage(
+        model_architecture_dict_for_tI, model_architecture_dict_for_tII
+    ):
+        covered_neurons = 0
+        total_neurons = 0
+        for k in range(
+            len(model_architecture_dict_for_tI)
+        ):  # k specifies the layer index, looping on the first test input
+            if (
+                k == len(model_architecture_dict_for_tI) - 1
+            ):  # check if the two test input are in the same index
+                break
+
+            after_act_fn_values = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k
+                )[0]
+            )
+            after_act_fn_values_for_consecutive_layer = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict_for_tI, k + 1
+                )[0]
+            )
+
+            for neuron_index in range(
+                len(after_act_fn_values)
+            ):  # neuron_index specifies the i value
+                for neuron_index_for_consecutive_layer in range(
+                    len(after_act_fn_values_for_consecutive_layer)
+                ):  # neuron_index_for_consecutive_layer specifies the j value
+                    if CoverageUtils.is_there_value_sign_change(
+                        k,
+                        neuron_index,
+                        neuron_index_for_consecutive_layer,
+                        model_architecture_dict_for_tI,
+                        model_architecture_dict_for_tII,
+                    ):
+                        covered_neurons = covered_neurons + 1
+
+                    total_neurons = total_neurons + 1
+
+        return covered_neurons, total_neurons, covered_neurons / total_neurons
+
+    @staticmethod
+    # Definition of fn: This function navigates the layer values resulting from the input
+    # value and takes the highest neuron value as the 'top_k' value given as a parameter
+    # for each layer. Then, it adds the values of 'top_k' neurons with the highest neuron
+    # values in each layer to a variable (it performs this operation by traveling through
+    # all layers). Finally, it divides this 'sum' variable by the number of neurons selected
+    # and presents an average value to the user.
     def TKNC(model_architecture_dict, top_k):
         tknc_sum = 0
-        for k in range(len(model_architecture_dict)): # K => layer
-            neuron_values = model_architecture_dict[str(k)]["after_act_func_values"][0]
+
+        for k in range(len(model_architecture_dict)):  # K => layer
+            neuron_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
+                model_architecture_dict, k
+            )[0]
+
             sorted_neuron_values, indices = torch.sort(neuron_values, descending=True)
             sorted_top_k = sorted_neuron_values[:top_k]
+
             sum_top_k = torch.sum(sorted_top_k)
             tknc_sum = sum_top_k + tknc_sum
+
         mean_top_k = tknc_sum / (top_k * len(model_architecture_dict))
+
         return mean_top_k
-    
+
     @staticmethod
-    def get_value_value_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
-        covered_neurons = 0
+    # Definition of fn: This function takes neuron values and layer information on the model
+    # as a result of one test input as a parameter. As the second parameter, it takes an
+    # input where the maximum and minimum neuron values of each layer are kept.
+    # The function of the function: for each neuron value, a comparison is made with the
+    # maximum and minimum neuron values in the relevant layer. If the neuron value is not
+    # between these maximum and minimum values, the variable named 'nbc_counter' is
+    # increased by one. The function calculates the number of neurons that are not between
+    # these minimum and maximum values and its ratio.
+    def NBC(model_architecture_dict, bound_dict):
+        nbc_counter = 0
         total_neurons = 0
 
-        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index, looping on the first test input
-            if k == len(model_architecture_dict_for_tI) - 1: #check if the two test input are in the same index 
-                break
-            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
-            after_act_fn_values_for_consecutive_layer = model_architecture_dict_for_tI[str(k + 1)]["after_act_func_values"][0]
-            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(len(after_act_fn_values_for_consecutive_layer)): # neuron_index_for_consecutive_layer specifies the j value
-                    if(CoverageUtils.is_there_value_value_change(k, neuron_index, neuron_index_for_consecutive_layer, 
-                                                model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
-                        covered_neurons = covered_neurons + 1
-                    total_neurons = total_neurons + 1
+        for layer_idx in model_architecture_dict:
+            after_act_fn_values = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict, layer_idx
+                )[0]
+            )
+            for neuron_value in after_act_fn_values:
+                if (
+                    neuron_value < bound_dict[layer_idx]["min_bound"]
+                    or neuron_value > bound_dict[layer_idx]["max_bound"]
+                ):
+                    nbc_counter = nbc_counter + 1
+            total_neurons = total_neurons + len(
+                model_architecture_dict[str(layer_idx)]["after_act_func_values"][0]
+            )
 
-        return covered_neurons, total_neurons, covered_neurons / total_neurons
+        return nbc_counter, total_neurons, nbc_counter / total_neurons
+
     @staticmethod
-    def get_sign_value_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
-        covered_neurons = 0
-        total_neurons = 0
+    # Definition of fn: This function takes a variable named 'node_intervals' as a parameter.
+    # The type of this variable is an array, and each index of this array contains a tupple
+    # of 'lower_bound' and 'upper_bound' pairs. For each tupple, index 0 is 'lower_bound'
+    # and index 1 is 'upper_bound'. The function cycles through the neuron values of the
+    # specific layer given as a parameter, and checks whether the relevant neuron value is
+    # between these lower and upper limits. It checks for each pair of lower and upper bound
+    # limits. As a result, it returns a counter array with the same size as how many pairs of
+    # lower and upper intervals are in the 'node_intervals' array.
+    def MNC_for_single_layer(node_intervals, layer):
+        m = len(node_intervals)
+        result = [0] * m
 
-        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index, looping on the first test input
-            if k == len(model_architecture_dict_for_tI) - 1: #check if the two test input are in the same index 
-                break
-            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
-            after_act_fn_values_for_consecutive_layer = model_architecture_dict_for_tI[str(k + 1)]["after_act_func_values"][0]
-            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(len(after_act_fn_values_for_consecutive_layer)): # neuron_index_for_consecutive_layer specifies the j value
-                    if(CoverageUtils.is_there_sign_value_change(k, neuron_index, neuron_index_for_consecutive_layer, 
-                                                model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
-                        covered_neurons = covered_neurons + 1
-                    total_neurons = total_neurons + 1
-        return covered_neurons, total_neurons, covered_neurons / total_neurons
+        for neuron in layer:
+            for i in range(m):
+                interval = node_intervals[i]
+                lower_bound = interval[0]
+                upper_bound = interval[1]
+
+                if neuron >= lower_bound and neuron <= upper_bound:
+                    result[i] = result[i] + 1
+
+        return result
+
     @staticmethod
-    def get_value_sign_coverage(model_architecture_dict_for_tI, model_architecture_dict_for_tII):
-        covered_neurons = 0
-        total_neurons = 0
-        for k in range(len(model_architecture_dict_for_tI)): # k specifies the layer index, looping on the first test input
-            if k == len(model_architecture_dict_for_tI) - 1: #check if the two test input are in the same index 
-                break
-            after_act_fn_values = model_architecture_dict_for_tI[str(k)]["after_act_func_values"][0]
-            after_act_fn_values_for_consecutive_layer = model_architecture_dict_for_tI[str(k + 1)]["after_act_func_values"][0]
-            for neuron_index in range(len(after_act_fn_values)): # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(len(after_act_fn_values_for_consecutive_layer)): # neuron_index_for_consecutive_layer specifies the j value
-                    if(CoverageUtils.is_there_value_sign_change(k, neuron_index, neuron_index_for_consecutive_layer, 
-                                                model_architecture_dict_for_tI, model_architecture_dict_for_tII)):
-                        covered_neurons = covered_neurons + 1
-                    total_neurons = total_neurons + 1
-        return covered_neurons, total_neurons, covered_neurons / total_neurons
+    # Definition of fn: Applies the 'MNC_for_single_layer' function for all layers.
+    def MNC(node_intervals, model_architecture_dict):
+        res_arr = []
 
+        for layer_idx in range(len(model_architecture_dict)):
+            after_act_fn_values = (
+                ModelArchitectureUtils.get_after_values_for_specific_layer(
+                    model_architecture_dict, layer_idx
+                )[0]
+            )
+
+            counter_arr = Coverage.MNC_for_single_layer(
+                node_intervals, after_act_fn_values
+            )
+
+            for index in range(len(counter_arr)):
+                counter_arr[index] = counter_arr[index] / len(after_act_fn_values)
+
+            res_arr.append(counter_arr)
+
+        return res_arr
