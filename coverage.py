@@ -8,10 +8,14 @@ from coverage_utils import CoverageUtils
 class Coverage:
     @staticmethod
     def get_neuron_coverage_for_single_layer(layer):
-        mean_of_layer = torch.mean(layer)
+        mean_of_layer = CoverageUtils.calculate_mean(layer)
 
-        num_of_covered_neurons_in_layer = len(layer[layer > mean_of_layer])
-        total_neurons_in_layer = len(layer[layer > -inf])
+        num_of_covered_neurons_in_layer = CoverageUtils.count_elements_above_threshold(
+            layer, mean_of_layer
+        )
+        total_neurons_in_layer = CoverageUtils.count_elements_above_threshold(
+            layer, -inf
+        )
 
         return (
             num_of_covered_neurons_in_layer,
@@ -41,8 +45,12 @@ class Coverage:
 
     @staticmethod
     def get_threshold_coverage_for_single_layer(layer, threshold_value=0.75):
-        num_of_covered_neurons_in_layer = len(layer[layer > threshold_value])
-        total_neurons_in_layer = len(layer[layer > -inf])
+        num_of_covered_neurons_in_layer = CoverageUtils.count_elements_above_threshold(
+            layer, threshold_value
+        )
+        total_neurons_in_layer = CoverageUtils.count_elements_above_threshold(
+            layer, -inf
+        )
 
         return (
             num_of_covered_neurons_in_layer,
@@ -57,12 +65,12 @@ class Coverage:
 
         for layer in layers:
             (
-                num_of_covered_neurons,
-                total_neurons,
+                num_of_covered_neurons_in_layer,
+                total_neurons_in_layer,
                 _,
-            ) = Coverage.get_threshold_coverage_for_single_layer(layer)
-            num_of_covered_neurons += num_of_covered_neurons
-            total_neurons += total_neurons
+            ) = Coverage.get_threshold_coverage_for_single_layer(layer, threshold_value)
+            num_of_covered_neurons += num_of_covered_neurons_in_layer
+            total_neurons += total_neurons_in_layer
 
         return (
             num_of_covered_neurons,
@@ -88,7 +96,7 @@ class Coverage:
             bool_tensor_first = layer_of_first_input > threshold_value
             bool_tensor_second = layer_of_second_input > threshold_value
 
-            result_bool_arr_of_layer = torch.logical_and(
+            result_bool_arr_of_layer = np.logical_and(
                 bool_tensor_first, bool_tensor_second
             )
             result_bool_arr_of_layers.append(result_bool_arr_of_layer)
@@ -129,15 +137,13 @@ class Coverage:
     # It visits all test inputs for the relevant neuron in the relevant layer and calculates how many times the
     # relevant neuron has been activated for these test inputs.
     def how_many_times_specific_neuron_activated(
-        model_architecture_dicts, layer_index, neuron_index, threshold_value=0.75
+        activation_infos, layer_index, neuron_index, threshold_value=0.75
     ):
         total_num_of_times_activated = 0
 
-        for model_architecture_dict in model_architecture_dicts:
+        for activation_info in activation_infos:
             after_values_all_layers = (
-                ModelArchitectureUtils.get_after_values_for_all_layers(
-                    model_architecture_dict
-                )
+                ModelArchitectureUtils.get_after_values_for_all_layers(activation_info)
             )
             layer = after_values_all_layers[layer_index]
             neuron_value = layer[0][neuron_index]
@@ -152,15 +158,13 @@ class Coverage:
     # of test inputs are above the threshold value for each neuron on the deep neural network.
     # The variable named 'counter_dict' records how many times each neuron in each layer is active.
     def how_many_times_neurons_activated(
-        counter_dict, model_architecture_dicts, threshold_value=0.75
+        counter_dict, activation_infos, threshold_value=0.75
     ):
         temp_counter_dict = counter_dict.copy()
 
-        for model_architecture_dict in model_architecture_dicts:
+        for activation_info in activation_infos:
             after_values_all_layers = (
-                ModelArchitectureUtils.get_after_values_for_all_layers(
-                    model_architecture_dict
-                )
+                ModelArchitectureUtils.get_after_values_for_all_layers(activation_info)
             )
 
             for layer_index, layer in enumerate(after_values_all_layers):
@@ -173,18 +177,14 @@ class Coverage:
         return temp_counter_dict
 
     @staticmethod
-    def get_sign_coverage(
-        model_architecture_dict_for_tI, model_architecture_dict_for_tII
-    ):
+    def get_sign_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(
-            len(model_architecture_dict_for_tI)
-        ):  # k specifies the layer index
+        for k in range(len(activation_info_for_tI)):  # k specifies the layer index
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k
+                    activation_info_for_tI, k
                 )[0]
             )
             for neuron_index in range(
@@ -193,8 +193,8 @@ class Coverage:
                 if CoverageUtils.is_there_sign_change(
                     k,
                     neuron_index,
-                    model_architecture_dict_for_tI,
-                    model_architecture_dict_for_tII,
+                    activation_info_for_tI,
+                    activation_info_for_tII,
                 ):
                     covered_neurons = covered_neurons + 1
 
@@ -203,18 +203,14 @@ class Coverage:
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_value_coverage(
-        model_architecture_dict_for_tI, model_architecture_dict_for_tII
-    ):
+    def get_value_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(
-            len(model_architecture_dict_for_tI)
-        ):  # k specifies the layer index
+        for k in range(len(activation_info_for_tI)):  # k specifies the layer index
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k
+                    activation_info_for_tI, k
                 )[0]
             )
 
@@ -224,8 +220,8 @@ class Coverage:
                 if CoverageUtils.is_there_value_change(
                     k,
                     neuron_index,
-                    model_architecture_dict_for_tI,
-                    model_architecture_dict_for_tII,
+                    activation_info_for_tI,
+                    activation_info_for_tII,
                 ):
                     covered_neurons = covered_neurons + 1
 
@@ -234,28 +230,26 @@ class Coverage:
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_sign_sign_coverage(
-        model_architecture_dict_for_tI, model_architecture_dict_for_tII
-    ):
+    def get_sign_sign_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
 
         for k in range(
-            len(model_architecture_dict_for_tI)
+            len(activation_info_for_tI)
         ):  # k specifies the layer index, looping on the first test input
             if (
-                k == len(model_architecture_dict_for_tI) - 1
+                k == len(activation_info_for_tI) - 1
             ):  # check if the two test input are in the same index
                 break
 
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k
+                    activation_info_for_tI, k
                 )[0]
             )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k + 1
+                    activation_info_for_tI, k + 1
                 )[0]
             )
 
@@ -269,8 +263,8 @@ class Coverage:
                         k,
                         neuron_index,
                         neuron_index_for_consecutive_layer,
-                        model_architecture_dict_for_tI,
-                        model_architecture_dict_for_tII,
+                        activation_info_for_tI,
+                        activation_info_for_tII,
                     ):
                         covered_neurons = covered_neurons + 1
 
@@ -279,28 +273,26 @@ class Coverage:
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_value_value_coverage(
-        model_architecture_dict_for_tI, model_architecture_dict_for_tII
-    ):
+    def get_value_value_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
 
         for k in range(
-            len(model_architecture_dict_for_tI)
+            len(activation_info_for_tI)
         ):  # k specifies the layer index, looping on the first test input
             if (
-                k == len(model_architecture_dict_for_tI) - 1
+                k == len(activation_info_for_tI) - 1
             ):  # check if the two test input are in the same index
                 break
 
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k
+                    activation_info_for_tI, k
                 )[0]
             )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k + 1
+                    activation_info_for_tI, k + 1
                 )[0]
             )
 
@@ -314,8 +306,8 @@ class Coverage:
                         k,
                         neuron_index,
                         neuron_index_for_consecutive_layer,
-                        model_architecture_dict_for_tI,
-                        model_architecture_dict_for_tII,
+                        activation_info_for_tI,
+                        activation_info_for_tII,
                     ):
                         covered_neurons = covered_neurons + 1
                     total_neurons = total_neurons + 1
@@ -323,28 +315,26 @@ class Coverage:
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_sign_value_coverage(
-        model_architecture_dict_for_tI, model_architecture_dict_for_tII
-    ):
+    def get_sign_value_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
 
         for k in range(
-            len(model_architecture_dict_for_tI)
+            len(activation_info_for_tI)
         ):  # k specifies the layer index, looping on the first test input
             if (
-                k == len(model_architecture_dict_for_tI) - 1
+                k == len(activation_info_for_tI) - 1
             ):  # check if the two test input are in the same index
                 break
 
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k
+                    activation_info_for_tI, k
                 )[0]
             )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k + 1
+                    activation_info_for_tI, k + 1
                 )[0]
             )
 
@@ -358,35 +348,33 @@ class Coverage:
                         k,
                         neuron_index,
                         neuron_index_for_consecutive_layer,
-                        model_architecture_dict_for_tI,
-                        model_architecture_dict_for_tII,
+                        activation_info_for_tI,
+                        activation_info_for_tII,
                     ):
                         covered_neurons = covered_neurons + 1
                     total_neurons = total_neurons + 1
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_value_sign_coverage(
-        model_architecture_dict_for_tI, model_architecture_dict_for_tII
-    ):
+    def get_value_sign_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
         for k in range(
-            len(model_architecture_dict_for_tI)
+            len(activation_info_for_tI)
         ):  # k specifies the layer index, looping on the first test input
             if (
-                k == len(model_architecture_dict_for_tI) - 1
+                k == len(activation_info_for_tI) - 1
             ):  # check if the two test input are in the same index
                 break
 
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k
+                    activation_info_for_tI, k
                 )[0]
             )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict_for_tI, k + 1
+                    activation_info_for_tI, k + 1
                 )[0]
             )
 
@@ -400,8 +388,8 @@ class Coverage:
                         k,
                         neuron_index,
                         neuron_index_for_consecutive_layer,
-                        model_architecture_dict_for_tI,
-                        model_architecture_dict_for_tII,
+                        activation_info_for_tI,
+                        activation_info_for_tII,
                     ):
                         covered_neurons = covered_neurons + 1
 
@@ -416,12 +404,12 @@ class Coverage:
     # values in each layer to a variable (it performs this operation by traveling through
     # all layers). Finally, it divides this 'sum' variable by the number of neurons selected
     # and presents an average value to the user.
-    def TKNC(model_architecture_dict, top_k):
+    def TKNC(activation_info, top_k):
         tknc_sum = 0
 
-        for k in range(len(model_architecture_dict)):  # K => layer
+        for k in range(len(activation_info)):  # K => layer
             neuron_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
-                model_architecture_dict, k
+                activation_info, k
             )[0]
 
             sorted_neuron_values, indices = torch.sort(neuron_values, descending=True)
@@ -430,7 +418,7 @@ class Coverage:
             sum_top_k = torch.sum(sorted_top_k)
             tknc_sum = sum_top_k + tknc_sum
 
-        mean_top_k = tknc_sum / (top_k * len(model_architecture_dict))
+        mean_top_k = tknc_sum / (top_k * len(activation_info))
 
         return mean_top_k
 
@@ -443,14 +431,14 @@ class Coverage:
     # between these maximum and minimum values, the variable named 'nbc_counter' is
     # increased by one. The function calculates the number of neurons that are not between
     # these minimum and maximum values and its ratio.
-    def NBC(model_architecture_dict, bound_dict):
+    def NBC(activation_info, bound_dict):
         nbc_counter = 0
         total_neurons = 0
 
-        for layer_idx in model_architecture_dict:
+        for layer_idx in activation_info:
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict, layer_idx
+                    activation_info, layer_idx
                 )[0]
             )
             for neuron_value in after_act_fn_values:
@@ -460,7 +448,7 @@ class Coverage:
                 ):
                     nbc_counter = nbc_counter + 1
             total_neurons = total_neurons + len(
-                model_architecture_dict[str(layer_idx)]["after_act_func_values"][0]
+                activation_info[str(layer_idx)]["after_act_func_values"][0]
             )
 
         return nbc_counter, total_neurons, nbc_counter / total_neurons
@@ -491,13 +479,13 @@ class Coverage:
 
     @staticmethod
     # Definition of fn: Applies the 'MNC_for_single_layer' function for all layers.
-    def MNC(node_intervals, model_architecture_dict):
+    def MNC(node_intervals, activation_info):
         res_arr = []
 
-        for layer_idx in range(len(model_architecture_dict)):
+        for layer_idx in range(len(activation_info)):
             after_act_fn_values = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    model_architecture_dict, layer_idx
+                    activation_info, layer_idx
                 )[0]
             )
 

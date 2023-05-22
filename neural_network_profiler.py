@@ -3,6 +3,15 @@ import torch.nn as nn
 import numpy as np
 from activation_functions import ActivationFunctions
 from torchviz import make_dot
+import copy
+
+
+def is_iterable(obj):
+    try:
+        iter(obj)
+        return True
+    except TypeError:
+        return False
 
 
 class NeuralNetworkProfiler:
@@ -11,7 +20,8 @@ class NeuralNetworkProfiler:
         model_layers_arr = []
 
         for name, layer in model._modules.items():
-            if isinstance(layer, nn.Sequential):
+            if is_iterable(layer):
+                print(dir(layer))
                 model_layers_arr.extend(NeuralNetworkProfiler.get_layer_names(layer))
             else:
                 model_layers_arr.append(layer)
@@ -24,6 +34,63 @@ class NeuralNetworkProfiler:
             layer_result = layer(input)
             print(layer_result)
             input = layer_result
+
+    @staticmethod
+    def get_activation_info(model, test_input):
+        model = copy.deepcopy(model)
+
+        # Aktivasyon bilgilerini depolamak için bir dictionary oluşturun
+        activation_info = {}
+
+        # Hook fonksiyonunu tanımlayın
+        def save_activation(consecutive_index, layer_index):
+            def hook(module, input, output):
+                activation_info[str(consecutive_index)] = {
+                    "layer_index": layer_index,
+                    "act_func": module.__class__.__name__,
+                    "before_act_func_values": input[0].detach().cpu().numpy(),
+                    "after_act_func_values": output.detach().cpu().numpy(),
+                }
+
+            return hook
+
+        activation_functions = [nn.ReLU, nn.Tanh, nn.Sigmoid, nn.LeakyReLU, nn.ELU]
+        # Aktivasyon fonksiyonlarına hook'u ekleyin
+        consecutive_index = 0
+        for layer_index, module in enumerate(model.modules()):
+            if any(
+                isinstance(module, activation_function)
+                for activation_function in activation_functions
+            ):
+                module.register_forward_hook(
+                    save_activation(
+                        consecutive_index,
+                        layer_index,
+                    )
+                )
+                consecutive_index += 1
+
+        # Girdi tensörünü oluşturun
+        input_tensor = torch.tensor(test_input)
+
+        # İleri geçişi yapın
+        model.eval()  # Modeli değerlendirme moduna getirin
+        with torch.no_grad():  # Gradyan hesaplamalarını devre dışı bırakın
+            output = model(input_tensor)
+
+        return activation_info
+
+    @staticmethod
+    def get_activation_infos_for_multiple_inputs(model, test_inputs):
+        activation_info_for_multiple_inputs = []
+
+        for test_input in test_inputs:
+            activation_info = NeuralNetworkProfiler.get_activation_info(
+                model, test_input
+            )
+            activation_info_for_multiple_inputs.append(activation_info)
+
+        return activation_info_for_multiple_inputs
 
     @staticmethod
     def get_model_architecture_dict_of_input(input, model_layers_arr):

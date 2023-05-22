@@ -1,41 +1,41 @@
 class ModelArchitectureUtils:
     @staticmethod
-    def get_before_values_for_specific_layer(model_architecture_dict, layer_index):
-        return model_architecture_dict[str(layer_index)]["before_act_func_values"]
+    def get_before_values_for_specific_layer(activation_info, layer_index):
+        return activation_info[str(layer_index)]["before_act_func_values"]
 
     @staticmethod
-    def get_before_values_for_all_layers(model_architecture_dict):
+    def get_before_values_for_all_layers(activation_info):
         before_values_for_all_layers = []
-        for layer_index in range(len(model_architecture_dict)):
+        for layer_index in range(len(activation_info)):
             before_values = ModelArchitectureUtils.get_before_values_for_specific_layer(
-                model_architecture_dict, layer_index
+                activation_info, layer_index
             )
             before_values_for_all_layers.append(before_values)
 
         return before_values_for_all_layers
 
     @staticmethod
-    def get_after_values_for_specific_layer(model_architecture_dict, layer_index):
-        return model_architecture_dict[str(layer_index)]["after_act_func_values"]
+    def get_after_values_for_specific_layer(activation_info, layer_index):
+        return activation_info[str(layer_index)]["after_act_func_values"]
 
     @staticmethod
-    def get_after_values_for_all_layers(model_architecture_dict):
+    def get_after_values_for_all_layers(activation_info):
         after_values_for_all_layers = []
-        for layer_index in range(len(model_architecture_dict)):
+        for layer_index in range(len(activation_info)):
             after_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
-                model_architecture_dict, layer_index
+                activation_info, layer_index
             )
             after_values_for_all_layers.append(after_values)
 
         return after_values_for_all_layers
 
     @staticmethod
-    def get_after_values_for_multiple_inputs(model_architecture_dicts_of_inputs):
+    def get_after_values_for_multiple_inputs(activation_infos_of_inputs):
         after_values_for_multiple_inputs = []
-        for model_architecture_dict_of_input in model_architecture_dicts_of_inputs:
+        for activation_info_of_input in activation_infos_of_inputs:
             after_values_for_all_layers = (
                 ModelArchitectureUtils.get_after_values_for_all_layers(
-                    model_architecture_dict_of_input
+                    activation_info_of_input
                 )
             )
             after_values_for_multiple_inputs.append(after_values_for_all_layers)
