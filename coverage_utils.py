@@ -7,14 +7,30 @@ import numpy as np
 class CoverageUtils:
     @staticmethod
     def is_there_sign_change(k, i, activation_info_for_tI, activation_info_for_tII):
-        neuron_value_for_tI = activation_info_for_tI[str(k)]["after_act_func_values"][
-            0
-        ][i]
+        neuron_value_for_tI = activation_info_for_tI[str(k)]["after_act_func_values"][i]
         neuron_value_for_tII = activation_info_for_tII[str(k)]["after_act_func_values"][
-            0
-        ][i]
+            i
+        ]
 
-        if neuron_value_for_tI * neuron_value_for_tII < 0:
+        if neuron_value_for_tI * neuron_value_for_tII <= 0:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def is_there_value_change(
+        k,
+        i,
+        activation_info_for_tI,
+        activation_info_for_tII,
+        threshold_value=0.05,
+    ):
+        neuron_value_for_tI = activation_info_for_tI[str(k)]["after_act_func_values"][i]
+        neuron_value_for_tII = activation_info_for_tII[str(k)]["after_act_func_values"][
+            i
+        ]
+
+        if abs(neuron_value_for_tI - neuron_value_for_tII) > threshold_value:
             return True
         else:
             return False
@@ -25,9 +41,10 @@ class CoverageUtils:
     ):
         flag = True
 
-        for neuron_index in range(
-            len(activation_info_for_tI[str(k)]["after_act_func_values"][0])
-        ):
+        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
+            "after_act_func_values"
+        ]
+        for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
                 if not CoverageUtils.is_there_sign_change(
                     k,
@@ -55,40 +72,23 @@ class CoverageUtils:
         return flag
 
     @staticmethod
-    def is_there_value_change(
-        k,
-        i,
-        activation_info_for_tI,
-        activation_info_for_tII,
-        threshold_value=0.05,
-    ):
-        neuron_value_for_tI = activation_info_for_tI[str(k)]["after_act_func_values"][
-            0
-        ][i]
-        neuron_value_for_tII = activation_info_for_tII[str(k)]["after_act_func_values"][
-            0
-        ][i]
-
-        if abs(neuron_value_for_tI - neuron_value_for_tII) > threshold_value:
-            return True
-        else:
-            return False
-
-    @staticmethod
     def is_there_value_value_change(
-        k, i, j, activation_info_for_tI, activation_info_for_tII
+        k, i, j, activation_info_for_tI, activation_info_for_tII, threshold_value=0.05
     ):
         flag = True
 
-        for neuron_index in range(
-            len(activation_info_for_tI[str(k)]["after_act_func_values"][0])
-        ):
+        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
+            "after_act_func_values"
+        ]
+
+        for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
                 if not CoverageUtils.is_there_value_change(
                     k,
                     i,
                     activation_info_for_tI,
                     activation_info_for_tII,
+                    threshold_value,
                 ):
                     flag = False
                     break
@@ -101,6 +101,7 @@ class CoverageUtils:
                 ):
                     flag = False
                     break
+
         if not CoverageUtils.is_there_value_change(
             k + 1, j, activation_info_for_tI, activation_info_for_tII
         ):
@@ -114,13 +115,15 @@ class CoverageUtils:
 
     @staticmethod
     def is_there_sign_value_change(
-        k, i, j, activation_info_for_tI, activation_info_for_tII
+        k, i, j, activation_info_for_tI, activation_info_for_tII, threshold_value=0.05
     ):
         flag = True
 
-        for neuron_index in range(
-            len(activation_info_for_tI[str(k)]["after_act_func_values"][0])
-        ):
+        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
+            "after_act_func_values"
+        ]
+
+        for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
                 if not CoverageUtils.is_there_sign_change(
                     k,
@@ -141,7 +144,7 @@ class CoverageUtils:
                     break
 
         if not CoverageUtils.is_there_value_change(
-            k + 1, j, activation_info_for_tI, activation_info_for_tII
+            k + 1, j, activation_info_for_tI, activation_info_for_tII, threshold_value
         ):
             flag = False
 
@@ -154,19 +157,22 @@ class CoverageUtils:
 
     @staticmethod
     def is_there_value_sign_change(
-        k, i, j, activation_info_for_tI, activation_info_for_tII
+        k, i, j, activation_info_for_tI, activation_info_for_tII, threshold_value=0.05
     ):
         flag = True
 
-        for neuron_index in range(
-            len(activation_info_for_tI[str(k)]["after_act_func_values"][0])
-        ):
+        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
+            "after_act_func_values"
+        ]
+
+        for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
                 if not CoverageUtils.is_there_value_change(
                     k,
                     i,
                     activation_info_for_tI,
                     activation_info_for_tII,
+                    threshold_value,
                 ):
                     flag = False
                     break

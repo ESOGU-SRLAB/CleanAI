@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from model_architecture_utils import ModelArchitectureUtils
 from coverage_utils import CoverageUtils
+from neural_network_profiler import NeuralNetworkProfiler
 
 
 class Coverage:
@@ -131,6 +132,8 @@ class Coverage:
         )
 
     @staticmethod
+    # This function is no longer in use. It can be removed later!
+
     # Definition of fn: This function takes only the 'after activation function' values of the relevant layer
     # for multiple test inputs, the index of the neuron dealing with in the relevant layer, and the threshold
     # value parameters as parameters.
@@ -160,72 +163,101 @@ class Coverage:
     def how_many_times_neurons_activated(
         counter_dict, activation_infos, threshold_value=0.75
     ):
-        temp_counter_dict = counter_dict.copy()
+        # counter_dict = NeuralNetworkProfiler.get_counter_dict_of_model(
+        #     model, activation_infos[0]
+        # )
 
         for activation_info in activation_infos:
             after_values_all_layers = (
                 ModelArchitectureUtils.get_after_values_for_all_layers(activation_info)
             )
 
-            for layer_index, layer in enumerate(after_values_all_layers):
-                for neuron_index, neuron_value in enumerate(layer[0]):
-                    if neuron_value > threshold_value:
-                        temp_counter_dict[str(layer_index)]["how_many_times_activated"][
-                            neuron_index
+            for layer_idx, layer in enumerate(after_values_all_layers):
+                for neuron_idx, neuron_val in np.ndenumerate(layer):
+                    if neuron_val > threshold_value:
+                        counter_dict[str(layer_idx)]["how_many_times_activated"][
+                            neuron_idx
                         ] += 1
+            # for layer_index, layer in enumerate(after_values_all_layers):
+            #     for neuron_index, neuron_value in enumerate(layer[0]):
+            #         if neuron_value > threshold_value:
+            #             temp_counter_dict[str(layer_index)]["how_many_times_activated"][
+            #                 neuron_index
+            #             ] += 1
 
-        return temp_counter_dict
+        return counter_dict
 
     @staticmethod
     def get_sign_coverage(activation_info_for_tI, activation_info_for_tII):
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(len(activation_info_for_tI)):  # k specifies the layer index
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k
-                )[0]
+        after_act_fn_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info_for_tI
             )
-            for neuron_index in range(
-                len(after_act_fn_values)
-            ):  # neuron_index specifies the i value
+        )
+
+        for layer_idx, layer in enumerate(after_act_fn_values_for_tI):
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
                 if CoverageUtils.is_there_sign_change(
-                    k,
-                    neuron_index,
+                    layer_idx,
+                    neuron_idx,
                     activation_info_for_tI,
                     activation_info_for_tII,
                 ):
-                    covered_neurons = covered_neurons + 1
+                    covered_neurons += 1
 
-                total_neurons = total_neurons + 1
+                total_neurons += 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
+        # for k in range(len(activation_info_for_tI)):  # k specifies the layer index
+        #     after_act_fn_values = (
+        #         ModelArchitectureUtils.get_after_values_for_specific_layer(
+        #             activation_info_for_tI, k
+        #         )[0]
+        #     )
+        #     for neuron_index in range(
+        #         len(after_act_fn_values)
+        #     ):  # neuron_index specifies the i value
+        #         if CoverageUtils.is_there_sign_change(
+        #             k,
+        #             neuron_index,
+        #             activation_info_for_tI,
+        #             activation_info_for_tII,
+        #         ):
+        #             covered_neurons = covered_neurons + 1
+
+        #         total_neurons = total_neurons + 1
+
+        # return covered_neurons, total_neurons, covered_neurons / total_neurons
+
     @staticmethod
-    def get_value_coverage(activation_info_for_tI, activation_info_for_tII):
+    def get_value_coverage(
+        activation_info_for_tI, activation_info_for_tII, threshold_value=0.75
+    ):
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(len(activation_info_for_tI)):  # k specifies the layer index
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k
-                )[0]
+        after_act_fn_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info_for_tI
             )
+        )
 
-            for neuron_index in range(
-                len(after_act_fn_values)
-            ):  # neuron_index specifies the i value
+        for layer_idx, layer in enumerate(after_act_fn_values_for_tI):
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
                 if CoverageUtils.is_there_value_change(
-                    k,
-                    neuron_index,
+                    layer_idx,
+                    neuron_idx,
                     activation_info_for_tI,
                     activation_info_for_tII,
+                    threshold_value,
                 ):
-                    covered_neurons = covered_neurons + 1
+                    covered_neurons += 1
 
-                total_neurons = total_neurons + 1
+                total_neurons += 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
@@ -234,166 +266,163 @@ class Coverage:
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(
-            len(activation_info_for_tI)
-        ):  # k specifies the layer index, looping on the first test input
-            if (
-                k == len(activation_info_for_tI) - 1
-            ):  # check if the two test input are in the same index
+        after_act_fn_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info_for_tI
+            )
+        )
+
+        for layer_idx, layer in enumerate(after_act_fn_values_for_tI):
+            if layer_idx == len(after_act_fn_values_for_tI) - 1:
                 break
 
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k
-                )[0]
-            )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k + 1
-                )[0]
+                    activation_info_for_tI, layer_idx + 1
+                )
             )
 
-            for neuron_index in range(
-                len(after_act_fn_values)
-            ):  # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(
-                    len(after_act_fn_values_for_consecutive_layer)
-                ):  # neuron_index_for_consecutive_layer specifies the j value
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
+                for (
+                    neuron_idx_for_consecutive_layer,
+                    neuron_val_for_consecutive_layer,
+                ) in np.ndenumerate(after_act_fn_values_for_consecutive_layer):
                     if CoverageUtils.is_there_sign_sign_change(
-                        k,
-                        neuron_index,
-                        neuron_index_for_consecutive_layer,
+                        layer_idx,
+                        neuron_idx,
+                        neuron_idx_for_consecutive_layer,
                         activation_info_for_tI,
                         activation_info_for_tII,
                     ):
-                        covered_neurons = covered_neurons + 1
+                        covered_neurons += 1
 
-                    total_neurons = total_neurons + 1
+                    total_neurons += 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_value_value_coverage(activation_info_for_tI, activation_info_for_tII):
+    def get_value_value_coverage(
+        activation_info_for_tI, activation_info_for_tII, threshold_value=0.75
+    ):
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(
-            len(activation_info_for_tI)
-        ):  # k specifies the layer index, looping on the first test input
-            if (
-                k == len(activation_info_for_tI) - 1
-            ):  # check if the two test input are in the same index
+        after_act_fn_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info_for_tI
+            )
+        )
+
+        for layer_idx, layer in enumerate(after_act_fn_values_for_tI):
+            if layer_idx == len(after_act_fn_values_for_tI) - 1:
                 break
 
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k
-                )[0]
-            )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k + 1
-                )[0]
+                    activation_info_for_tI, layer_idx + 1
+                )
             )
 
-            for neuron_index in range(
-                len(after_act_fn_values)
-            ):  # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(
-                    len(after_act_fn_values_for_consecutive_layer)
-                ):  # neuron_index_for_consecutive_layer specifies the j value
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
+                for (
+                    neuron_idx_for_consecutive_layer,
+                    neuron_val_for_consecutive_layer,
+                ) in np.ndenumerate(after_act_fn_values_for_consecutive_layer):
                     if CoverageUtils.is_there_value_value_change(
-                        k,
-                        neuron_index,
-                        neuron_index_for_consecutive_layer,
+                        layer_idx,
+                        neuron_idx,
+                        neuron_idx_for_consecutive_layer,
                         activation_info_for_tI,
                         activation_info_for_tII,
+                        threshold_value,
                     ):
-                        covered_neurons = covered_neurons + 1
-                    total_neurons = total_neurons + 1
+                        covered_neurons += 1
+
+                    total_neurons += 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_sign_value_coverage(activation_info_for_tI, activation_info_for_tII):
+    def get_sign_value_coverage(
+        activation_info_for_tI, activation_info_for_tII, threshold_value=0.75
+    ):
         covered_neurons = 0
         total_neurons = 0
 
-        for k in range(
-            len(activation_info_for_tI)
-        ):  # k specifies the layer index, looping on the first test input
-            if (
-                k == len(activation_info_for_tI) - 1
-            ):  # check if the two test input are in the same index
+        after_act_fn_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info_for_tI
+            )
+        )
+
+        for layer_idx, layer in enumerate(after_act_fn_values_for_tI):
+            if layer_idx == len(after_act_fn_values_for_tI) - 1:
                 break
 
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k
-                )[0]
-            )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k + 1
-                )[0]
+                    activation_info_for_tI, layer_idx + 1
+                )
             )
 
-            for neuron_index in range(
-                len(after_act_fn_values)
-            ):  # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(
-                    len(after_act_fn_values_for_consecutive_layer)
-                ):  # neuron_index_for_consecutive_layer specifies the j value
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
+                for (
+                    neuron_idx_for_consecutive_layer,
+                    neuron_val_for_consecutive_layer,
+                ) in np.ndenumerate(after_act_fn_values_for_consecutive_layer):
                     if CoverageUtils.is_there_sign_value_change(
-                        k,
-                        neuron_index,
-                        neuron_index_for_consecutive_layer,
+                        layer_idx,
+                        neuron_idx,
+                        neuron_idx_for_consecutive_layer,
                         activation_info_for_tI,
                         activation_info_for_tII,
+                        threshold_value,
                     ):
-                        covered_neurons = covered_neurons + 1
-                    total_neurons = total_neurons + 1
+                        covered_neurons += 1
+
+                    total_neurons += 1
+
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
-    def get_value_sign_coverage(activation_info_for_tI, activation_info_for_tII):
+    def get_value_sign_coverage(
+        activation_info_for_tI, activation_info_for_tII, threshold_value=0.75
+    ):
         covered_neurons = 0
         total_neurons = 0
-        for k in range(
-            len(activation_info_for_tI)
-        ):  # k specifies the layer index, looping on the first test input
-            if (
-                k == len(activation_info_for_tI) - 1
-            ):  # check if the two test input are in the same index
+
+        after_act_fn_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info_for_tI
+            )
+        )
+
+        for layer_idx, layer in enumerate(after_act_fn_values_for_tI):
+            if layer_idx == len(after_act_fn_values_for_tI) - 1:
                 break
 
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k
-                )[0]
-            )
             after_act_fn_values_for_consecutive_layer = (
                 ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info_for_tI, k + 1
-                )[0]
+                    activation_info_for_tI, layer_idx + 1
+                )
             )
 
-            for neuron_index in range(
-                len(after_act_fn_values)
-            ):  # neuron_index specifies the i value
-                for neuron_index_for_consecutive_layer in range(
-                    len(after_act_fn_values_for_consecutive_layer)
-                ):  # neuron_index_for_consecutive_layer specifies the j value
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
+                for (
+                    neuron_idx_for_consecutive_layer,
+                    neuron_val_for_consecutive_layer,
+                ) in np.ndenumerate(after_act_fn_values_for_consecutive_layer):
                     if CoverageUtils.is_there_value_sign_change(
-                        k,
-                        neuron_index,
-                        neuron_index_for_consecutive_layer,
+                        layer_idx,
+                        neuron_idx,
+                        neuron_idx_for_consecutive_layer,
                         activation_info_for_tI,
                         activation_info_for_tII,
+                        threshold_value,
                     ):
-                        covered_neurons = covered_neurons + 1
+                        covered_neurons += 1
 
-                    total_neurons = total_neurons + 1
+                    total_neurons += 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
 

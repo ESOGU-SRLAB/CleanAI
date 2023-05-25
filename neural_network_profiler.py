@@ -16,6 +16,7 @@ def is_iterable(obj):
 
 class NeuralNetworkProfiler:
     @staticmethod
+    # This function is no longer in use. It can be removed later!
     def get_layer_names(model):
         model_layers_arr = []
 
@@ -29,6 +30,7 @@ class NeuralNetworkProfiler:
         return model_layers_arr
 
     @staticmethod
+    # This function is no longer in use. It can be removed later!
     def run_model_with_array(input, model_layers_arr):
         for layer in model_layers_arr:
             layer_result = layer(input)
@@ -54,7 +56,7 @@ class NeuralNetworkProfiler:
 
             return hook
 
-        activation_functions = [nn.ReLU, nn.Tanh, nn.Sigmoid, nn.LeakyReLU, nn.ELU]
+        activation_functions = ActivationFunctions.get_activation_functions()
         # Aktivasyon fonksiyonlarına hook'u ekleyin
         consecutive_index = 0
         for layer_index, module in enumerate(model.modules()):
@@ -93,6 +95,7 @@ class NeuralNetworkProfiler:
         return activation_info_for_multiple_inputs
 
     @staticmethod
+    # This function is no longer in use. It can be removed later!
     def get_model_architecture_dict_of_input(input, model_layers_arr):
         model_architecture_dict_of_input = {}  # initializing the model architecture
         index = 0
@@ -124,6 +127,7 @@ class NeuralNetworkProfiler:
         return model_architecture_dict_of_input  # return the model architecture
 
     @staticmethod
+    # This function is no longer in use. It can be removed later!
     def get_model_architecture_dicts_of_inputs(inputs, model_layers_arr):
         model_architecture_dicts_of_inputs = []
 
@@ -138,30 +142,50 @@ class NeuralNetworkProfiler:
         return model_architecture_dicts_of_inputs  # return the model architecture
 
     @staticmethod
-    def get_counter_dict_of_model(model_layers_arr):
-        counter_dict_of_model = {}  # initializing the model architecture
-        index = 0
+    def get_counter_dict_of_model(model, test_input):
+        model = copy.deepcopy(model)
 
-        for idx, layer in zip(range(len(model_layers_arr)), model_layers_arr):
-            layer = model_layers_arr[idx]
+        # Aktivasyon bilgilerini depolamak için bir dictionary oluşturun
+        activation_info = {}
 
-            for activation_function in ActivationFunctions.get_activation_functions():
-                if isinstance(
-                    layer, activation_function
-                ):  # find a model class defination for example (relu, sigmoid, tanh...)
-                    layer_props = {
-                        "layer_index": idx,
-                        "act_func": layer,
-                        "how_many_times_activated": [0] * out_features,
-                    }
+        # Hook fonksiyonunu tanımlayın
+        def save_activation(consecutive_index, layer_index):
+            def hook(module, input, output):
+                activation_info[str(consecutive_index)] = {
+                    "layer_index": layer_index,
+                    "act_func": module.__class__.__name__,
+                    "how_many_times_activated": np.zeros_like(
+                        output.detach().cpu().numpy()
+                    ),
+                }
 
-                    counter_dict_of_model[str(index)] = layer_props
-                    index = index + 1
+            return hook
 
-                elif isinstance(layer, nn.Linear):
-                    out_features = layer.out_features
+        activation_functions = ActivationFunctions.get_activation_functions()
+        # Aktivasyon fonksiyonlarına hook'u ekleyin
+        consecutive_index = 0
+        for layer_index, module in enumerate(model.modules()):
+            if any(
+                isinstance(module, activation_function)
+                for activation_function in activation_functions
+            ):
+                module.register_forward_hook(
+                    save_activation(
+                        consecutive_index,
+                        layer_index,
+                    )
+                )
+                consecutive_index += 1
 
-        return counter_dict_of_model
+        # Girdi tensörünü oluşturun
+        input_tensor = torch.tensor(test_input)
+
+        # İleri geçişi yapın
+        model.eval()  # Modeli değerlendirme moduna getirin
+        with torch.no_grad():  # Gradyan hesaplamalarını devre dışı bırakın
+            output = model(input_tensor)
+
+        return activation_info
 
     @staticmethod
     def visualize_model(model, test_input):
