@@ -41,3 +41,10 @@ class ModelArchitectureUtils:
             after_values_for_multiple_inputs.append(after_values_for_all_layers)
 
         return after_values_for_multiple_inputs
+
+    @staticmethod
+    def get_neuron_value_from_after_values(activation_info, layer_index, neuron_index):
+        neuron_value = ModelArchitectureUtils.get_after_values_for_specific_layer(
+            activation_info, layer_index
+        )[neuron_index]
+        return neuron_value

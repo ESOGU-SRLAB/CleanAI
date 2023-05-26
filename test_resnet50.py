@@ -11,6 +11,7 @@ from torchvision.transforms import ToTensor
 
 from neural_network_profiler import NeuralNetworkProfiler
 from coverage import Coverage
+from coverage_utils import CoverageUtils
 from model_architecture_utils import ModelArchitectureUtils
 from print_utils import PrintUtils
 from dataset import Dataset
@@ -61,10 +62,13 @@ for uri, result in zip(uris, results):
 # ---------------------------------------
 
 activation_info_for_tI = NeuralNetworkProfiler.get_activation_info(
-    model, batch[2].unsqueeze(0)
+    model, batch[0].unsqueeze(0)
 )
 activation_info_for_tII = NeuralNetworkProfiler.get_activation_info(
-    model, batch[0].unsqueeze(0)
+    model, batch[1].unsqueeze(0)
+)
+activation_info_for_tIII = NeuralNetworkProfiler.get_activation_info(
+    model, batch[2].unsqueeze(0)
 )
 
 last_layer_after_values_for_tI = (
@@ -254,160 +258,215 @@ print(f"---------------------------------------\n")
 # print(f"hw_many_times_activated: {hw_many_times_activated}")
 # print(f"---------------------------------------\n")
 
-print(f"---------------------------------------")
-print(f"Coverage.get_sign_coverage:\n")
-(covered_neurons, total_neurons, coverage) = Coverage.get_sign_coverage(
-    activation_info_for_tI, activation_info_for_tII
-)
-PrintUtils.print_table(
-    [
-        "Number of covered neurons",
-        "Total number of neurons",
-        "Coverage",
-    ],
-    ["Sign coverage"],
-    [
-        [
-            covered_neurons,
-            total_neurons,
-            "{:.2f}".format(coverage * 100) + "%",
-        ]
-    ],
-)
-print(f"---------------------------------------\n")
+# print(f"---------------------------------------")
+# print(f"Coverage.get_sign_coverage:\n")
+# (covered_neurons, total_neurons, coverage) = Coverage.get_sign_coverage(
+#     activation_info_for_tI, activation_info_for_tII
+# )
+# PrintUtils.print_table(
+#     [
+#         "Number of covered neurons",
+#         "Total number of neurons",
+#         "Coverage",
+#     ],
+#     ["Sign coverage"],
+#     [
+#         [
+#             covered_neurons,
+#             total_neurons,
+#             "{:.2f}".format(coverage * 100) + "%",
+#         ]
+#     ],
+# )
+# print(f"---------------------------------------\n")
 
-print(f"---------------------------------------")
-print(f"Coverage.get_value_coverage:\n")
-(covered_neurons, total_neurons, coverage) = Coverage.get_value_coverage(
-    activation_info_for_tI, activation_info_for_tII, 0.15
-)
-PrintUtils.print_table(
-    [
-        "Threshold value",
-        "Number of covered neurons",
-        "Total number of neurons",
-        "Coverage",
-    ],
-    ["Value coverage"],
-    [
-        [
-            0.15,
-            covered_neurons,
-            total_neurons,
-            "{:.2f}".format(coverage * 100) + "%",
-        ]
-    ],
-)
-print(f"---------------------------------------\n")
+# print(f"---------------------------------------")
+# print(f"Coverage.get_value_coverage:\n")
+# (covered_neurons, total_neurons, coverage) = Coverage.get_value_coverage(
+#     activation_info_for_tI, activation_info_for_tII, 0.15
+# )
+# PrintUtils.print_table(
+#     [
+#         "Threshold value",
+#         "Number of covered neurons",
+#         "Total number of neurons",
+#         "Coverage",
+#     ],
+#     ["Value coverage"],
+#     [
+#         [
+#             0.15,
+#             covered_neurons,
+#             total_neurons,
+#             "{:.2f}".format(coverage * 100) + "%",
+#         ]
+#     ],
+# )
+# print(f"---------------------------------------\n")
 
 # --------------------------------------- SS-SV-VS-VV in our model ---------------------------------------
-model = torch.load("model.pth")
-print(model)
-training_data = FashionMNIST(
-    root="data", train=True, download=True, transform=ToTensor()
-)
+# model = torch.load("model.pth")
+# print(model)
+# training_data = FashionMNIST(
+#     root="data", train=True, download=True, transform=ToTensor()
+# )
 
-test_data = FashionMNIST(root="data", train=False, download=True, transform=ToTensor())
+# test_data = FashionMNIST(root="data", train=False, download=True, transform=ToTensor())
 
 
-dataset = Dataset(training_data, test_data)
-activation_info_for_tI = NeuralNetworkProfiler.get_activation_info(
-    model, dataset.get_random_input()
-)
-activation_info_for_tII = NeuralNetworkProfiler.get_activation_info(
-    model, dataset.get_random_input()
-)
+# dataset = Dataset(training_data, test_data)
+# activation_info_for_tI = NeuralNetworkProfiler.get_activation_info(
+#     model, dataset.get_random_input()
+# )
+# activation_info_for_tII = NeuralNetworkProfiler.get_activation_info(
+#     model, dataset.get_random_input()
+# )
+
+# print(f"---------------------------------------")
+# print(f"Coverage.get_sign_sign_coverage:\n")
+# (covered_neurons, total_neurons, coverage) = Coverage.get_sign_sign_coverage(
+#     activation_info_for_tI, activation_info_for_tII
+# )
+# PrintUtils.print_table(
+#     [
+#         "Number of covered neurons",
+#         "Total number of neurons",
+#         "Coverage",
+#     ],
+#     ["Sign-Sign coverage"],
+#     [
+#         [
+#             covered_neurons,
+#             total_neurons,
+#             "{:.2f}".format(coverage * 100) + "%",
+#         ]
+#     ],
+# )
+# print(f"---------------------------------------\n")
+
+# print(f"---------------------------------------")
+# print(f"Coverage.get_value_value_coverage:\n")
+# (covered_neurons, total_neurons, coverage) = Coverage.get_value_value_coverage(
+#     activation_info_for_tI, activation_info_for_tII, 0.01
+# )
+# PrintUtils.print_table(
+#     [
+#         "Threshold value",
+#         "Number of covered neurons",
+#         "Total number of neurons",
+#         "Coverage",
+#     ],
+#     ["Value-Value coverage"],
+#     [
+#         [
+#             0.01,
+#             covered_neurons,
+#             total_neurons,
+#             "{:.2f}".format(coverage * 100) + "%",
+#         ]
+#     ],
+# )
+# print(f"---------------------------------------\n")
+
+# print(f"---------------------------------------")
+# print(f"Coverage.get_sign_value_coverage:\n")
+# (covered_neurons, total_neurons, coverage) = Coverage.get_sign_value_coverage(
+#     activation_info_for_tI, activation_info_for_tII, 0.01
+# )
+# PrintUtils.print_table(
+#     [
+#         "Threshold value",
+#         "Number of covered neurons",
+#         "Total number of neurons",
+#         "Coverage",
+#     ],
+#     ["Sign-Value coverage"],
+#     [
+#         [
+#             0.01,
+#             covered_neurons,
+#             total_neurons,
+#             "{:.2f}".format(coverage * 100) + "%",
+#         ]
+#     ],
+# )
+# print(f"---------------------------------------\n")
+
+# print(f"---------------------------------------")
+# print(f"Coverage.get_value_sign_coverage:\n")
+# (covered_neurons, total_neurons, coverage) = Coverage.get_value_sign_coverage(
+#     activation_info_for_tI, activation_info_for_tII, 0.01
+# )
+# PrintUtils.print_table(
+#     [
+#         "Threshold value",
+#         "Number of covered neurons",
+#         "Total number of neurons",
+#         "Coverage",
+#     ],
+#     ["Value-Sign coverage"],
+#     [
+#         [
+#             0.01,
+#             covered_neurons,
+#             total_neurons,
+#             "{:.2f}".format(coverage * 100) + "%",
+#         ]
+#     ],
+# )
+# print(f"---------------------------------------\n")
 
 print(f"---------------------------------------")
-print(f"Coverage.get_sign_sign_coverage:\n")
-(covered_neurons, total_neurons, coverage) = Coverage.get_sign_sign_coverage(
-    activation_info_for_tI, activation_info_for_tII
+print(f"Coverage.TKNC:\n")
+(tknc_sum, num_of_selected_neurons, mean_top_k) = Coverage.TKNC(
+    activation_info_for_tI, 5
 )
 PrintUtils.print_table(
     [
-        "Number of covered neurons",
-        "Total number of neurons",
-        "Coverage",
+        "K value",
+        "Sum of Top-K neurons",
+        "Number of selected neurons",
+        "Mean of Top-K neurons",
     ],
-    ["Sign-Sign coverage"],
+    ["Top-K coverage"],
     [
         [
-            covered_neurons,
-            total_neurons,
-            "{:.2f}".format(coverage * 100) + "%",
+            5,
+            "{:.2f}".format(tknc_sum),
+            num_of_selected_neurons,
+            "{:.2f}".format(mean_top_k),
         ]
     ],
 )
 print(f"---------------------------------------\n")
 
 print(f"---------------------------------------")
-print(f"Coverage.get_value_value_coverage:\n")
-(covered_neurons, total_neurons, coverage) = Coverage.get_value_value_coverage(
-    activation_info_for_tI, activation_info_for_tII, 0.01
+print(f"Coverage.NBC:\n")
+bound_dict = CoverageUtils.get_bounds_for_layers(
+    [activation_info_for_tI, activation_info_for_tII]
+)
+(nbc_counter, total_neurons, nbc_coverage) = Coverage.NBC(
+    activation_info_for_tIII, bound_dict
 )
 PrintUtils.print_table(
     [
-        "Threshold value",
-        "Number of covered neurons",
-        "Total number of neurons",
+        "NBC counter",
+        "Number of total neurons",
         "Coverage",
     ],
-    ["Value-Value coverage"],
+    ["Neuron boundary coverage"],
     [
         [
-            0.01,
-            covered_neurons,
+            nbc_counter,
             total_neurons,
-            "{:.2f}".format(coverage * 100) + "%",
+            "{:.2f}".format(nbc_coverage * 100) + "%",
         ]
     ],
 )
 print(f"---------------------------------------\n")
 
 print(f"---------------------------------------")
-print(f"Coverage.get_sign_value_coverage:\n")
-(covered_neurons, total_neurons, coverage) = Coverage.get_sign_value_coverage(
-    activation_info_for_tI, activation_info_for_tII, 0.01
-)
-PrintUtils.print_table(
-    [
-        "Threshold value",
-        "Number of covered neurons",
-        "Total number of neurons",
-        "Coverage",
-    ],
-    ["Sign-Value coverage"],
-    [
-        [
-            0.01,
-            covered_neurons,
-            total_neurons,
-            "{:.2f}".format(coverage * 100) + "%",
-        ]
-    ],
-)
-print(f"---------------------------------------\n")
-
-print(f"---------------------------------------")
-print(f"Coverage.get_value_sign_coverage:\n")
-(covered_neurons, total_neurons, coverage) = Coverage.get_value_sign_coverage(
-    activation_info_for_tI, activation_info_for_tII, 0.01
-)
-PrintUtils.print_table(
-    [
-        "Threshold value",
-        "Number of covered neurons",
-        "Total number of neurons",
-        "Coverage",
-    ],
-    ["Value-Sign coverage"],
-    [
-        [
-            0.01,
-            covered_neurons,
-            total_neurons,
-            "{:.2f}".format(coverage * 100) + "%",
-        ]
-    ],
-)
+print(f"Coverage.MNC:\n")
+res_arr = Coverage.MNC([(0.5, 0.8), (0.9, 1.5)], activation_info_for_tI)
+print(f"counter_arr: {res_arr}")
 print(f"---------------------------------------\n")

@@ -3,14 +3,20 @@ import torch
 import tensorflow as tf
 import numpy as np
 
+from model_architecture_utils import ModelArchitectureUtils
+
 
 class CoverageUtils:
     @staticmethod
     def is_there_sign_change(k, i, activation_info_for_tI, activation_info_for_tII):
-        neuron_value_for_tI = activation_info_for_tI[str(k)]["after_act_func_values"][i]
-        neuron_value_for_tII = activation_info_for_tII[str(k)]["after_act_func_values"][
-            i
-        ]
+        neuron_value_for_tI = ModelArchitectureUtils.get_neuron_value_from_after_values(
+            activation_info_for_tI, k, i
+        )
+        neuron_value_for_tII = (
+            ModelArchitectureUtils.get_neuron_value_from_after_values(
+                activation_info_for_tII, k, i
+            )
+        )
 
         if neuron_value_for_tI * neuron_value_for_tII <= 0:
             return True
@@ -25,10 +31,14 @@ class CoverageUtils:
         activation_info_for_tII,
         threshold_value=0.05,
     ):
-        neuron_value_for_tI = activation_info_for_tI[str(k)]["after_act_func_values"][i]
-        neuron_value_for_tII = activation_info_for_tII[str(k)]["after_act_func_values"][
-            i
-        ]
+        neuron_value_for_tI = ModelArchitectureUtils.get_neuron_value_from_after_values(
+            activation_info_for_tI, k, i
+        )
+        neuron_value_for_tII = (
+            ModelArchitectureUtils.get_neuron_value_from_after_values(
+                activation_info_for_tII, k, i
+            )
+        )
 
         if abs(neuron_value_for_tI - neuron_value_for_tII) > threshold_value:
             return True
@@ -41,9 +51,12 @@ class CoverageUtils:
     ):
         flag = True
 
-        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
-            "after_act_func_values"
-        ]
+        after_act_func_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_specific_layer(
+                activation_info_for_tI, k
+            )
+        )
+
         for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
                 if not CoverageUtils.is_there_sign_change(
@@ -77,9 +90,11 @@ class CoverageUtils:
     ):
         flag = True
 
-        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
-            "after_act_func_values"
-        ]
+        after_act_func_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_specific_layer(
+                activation_info_for_tI, k
+            )
+        )
 
         for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
@@ -119,9 +134,11 @@ class CoverageUtils:
     ):
         flag = True
 
-        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
-            "after_act_func_values"
-        ]
+        after_act_func_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_specific_layer(
+                activation_info_for_tI, k
+            )
+        )
 
         for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
@@ -161,9 +178,11 @@ class CoverageUtils:
     ):
         flag = True
 
-        after_act_func_values_for_tI = activation_info_for_tI[str(k)][
-            "after_act_func_values"
-        ]
+        after_act_func_values_for_tI = (
+            ModelArchitectureUtils.get_after_values_for_specific_layer(
+                activation_info_for_tI, k
+            )
+        )
 
         for neuron_index, neuron_value in np.ndenumerate(after_act_func_values_for_tI):
             if i == neuron_index:
@@ -205,18 +224,15 @@ class CoverageUtils:
         max = -inf
 
         for activation_info in activation_infos:
-            torch_min = torch.min(
-                activation_info[str(layer_idx)]["after_act_func_values"][0]
-            )
-            torch_max = torch.max(
-                activation_info[str(layer_idx)]["after_act_func_values"][0]
+            after_act_func_values_all_layers = (
+                ModelArchitectureUtils.get_after_values_for_all_layers(activation_info)
             )
 
-            torch_min = torch_min.item()
-            torch_max = torch_max.item()
+            np_min = np.min(after_act_func_values_all_layers[layer_idx])
+            np_max = np.max(after_act_func_values_all_layers[layer_idx])
 
-            min = min if min < torch_min else torch_min
-            max = max if max > torch_max else torch_max
+            min = min if min < np_min else np_min
+            max = max if max > np_max else np_max
 
         return min, max
 

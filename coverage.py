@@ -436,20 +436,21 @@ class Coverage:
     def TKNC(activation_info, top_k):
         tknc_sum = 0
 
-        for k in range(len(activation_info)):  # K => layer
-            neuron_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
-                activation_info, k
-            )[0]
+        after_act_fn_values = ModelArchitectureUtils.get_after_values_for_all_layers(
+            activation_info
+        )
 
-            sorted_neuron_values, indices = torch.sort(neuron_values, descending=True)
-            sorted_top_k = sorted_neuron_values[:top_k]
+        for layer_idx, layer in enumerate(after_act_fn_values):
+            sorted_layer = np.sort(layer, axis=None)[::-1]
+            sorted_top_k = sorted_layer[:top_k]
 
-            sum_top_k = torch.sum(sorted_top_k)
+            sum_top_k = np.sum(sorted_top_k)
             tknc_sum = sum_top_k + tknc_sum
 
-        mean_top_k = tknc_sum / (top_k * len(activation_info))
+        num_of_selected_neurons = top_k * len(after_act_fn_values)
+        mean_top_k = tknc_sum / num_of_selected_neurons
 
-        return mean_top_k
+        return (tknc_sum, num_of_selected_neurons, mean_top_k)
 
     @staticmethod
     # Definition of fn: This function takes neuron values and layer information on the model
@@ -464,21 +465,18 @@ class Coverage:
         nbc_counter = 0
         total_neurons = 0
 
-        for layer_idx in activation_info:
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info, layer_idx
-                )[0]
-            )
-            for neuron_value in after_act_fn_values:
+        after_act_fn_values = ModelArchitectureUtils.get_after_values_for_all_layers(
+            activation_info
+        )
+
+        for layer_idx, layer in enumerate(after_act_fn_values):
+            for neuron_idx, neuron_val in np.ndenumerate(layer):
                 if (
-                    neuron_value < bound_dict[layer_idx]["min_bound"]
-                    or neuron_value > bound_dict[layer_idx]["max_bound"]
+                    neuron_val < bound_dict[str(layer_idx)]["min_bound"]
+                    or neuron_val > bound_dict[str(layer_idx)]["max_bound"]
                 ):
                     nbc_counter = nbc_counter + 1
-            total_neurons = total_neurons + len(
-                activation_info[str(layer_idx)]["after_act_func_values"][0]
-            )
+                total_neurons = total_neurons + 1
 
         return nbc_counter, total_neurons, nbc_counter / total_neurons
 
@@ -491,17 +489,23 @@ class Coverage:
     # between these lower and upper limits. It checks for each pair of lower and upper bound
     # limits. As a result, it returns a counter array with the same size as how many pairs of
     # lower and upper intervals are in the 'node_intervals' array.
-    def MNC_for_single_layer(node_intervals, layer):
+    def MNC_for_single_layer(node_intervals, activation_info, layer_index):
         m = len(node_intervals)
         result = [0] * m
 
-        for neuron in layer:
+        after_act_fn_values_for_layer = (
+            ModelArchitectureUtils.get_after_values_for_specific_layer(
+                activation_info, layer_index
+            )
+        )
+
+        for neuron_idx, neuron_val in np.ndenumerate(after_act_fn_values_for_layer):
             for i in range(m):
                 interval = node_intervals[i]
                 lower_bound = interval[0]
                 upper_bound = interval[1]
 
-                if neuron >= lower_bound and neuron <= upper_bound:
+                if neuron_val >= lower_bound and neuron_val <= upper_bound:
                     result[i] = result[i] + 1
 
         return result
@@ -511,19 +515,19 @@ class Coverage:
     def MNC(node_intervals, activation_info):
         res_arr = []
 
-        for layer_idx in range(len(activation_info)):
-            after_act_fn_values = (
-                ModelArchitectureUtils.get_after_values_for_specific_layer(
-                    activation_info, layer_idx
-                )[0]
-            )
+        after_act_fn_values = ModelArchitectureUtils.get_after_values_for_all_layers(
+            activation_info
+        )
 
+        for layer_idx, layer in enumerate(after_act_fn_values):
             counter_arr = Coverage.MNC_for_single_layer(
-                node_intervals, after_act_fn_values
+                node_intervals, activation_info, layer_idx
             )
 
             for index in range(len(counter_arr)):
-                counter_arr[index] = counter_arr[index] / len(after_act_fn_values)
+                counter_arr[index] = counter_arr[
+                    index
+                ] / CoverageUtils.count_elements_above_threshold(layer, -inf)
 
             res_arr.append(counter_arr)
 
