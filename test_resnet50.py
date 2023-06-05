@@ -7,7 +7,7 @@ import requests
 import numpy as np
 from torchvision.datasets import FashionMNIST
 from torchvision.transforms import ToTensor
-
+from save_analize_reports import SaveAnalyse
 
 from neural_network_profiler import NeuralNetworkProfiler
 from coverage import Coverage
@@ -57,7 +57,7 @@ for uri, result in zip(uris, results):
     img.thumbnail((256, 256), Image.ANTIALIAS)
     # plt.imshow(img)
     # plt.show()
-    print(result)
+    # print(result)
 
 # ---------------------------------------
 
@@ -84,13 +84,13 @@ all_layers_after_values_for_tII = (
     ModelArchitectureUtils.get_after_values_for_all_layers(activation_info_for_tII)
 )
 
-print(f"---------------------------------------")
-print(f"activation_info_for_tI: {activation_info_for_tI}\n")
-print(f"---------------------------------------\n")
+# print(f"---------------------------------------")
+# print(f"activation_info_for_tI: {activation_info_for_tI}\n")
+# print(f"---------------------------------------\n")
 
-print(f"---------------------------------------")
-print(f"last_layer_after_values_for_tI: {last_layer_after_values_for_tI}\n")
-print(f"---------------------------------------\n")
+# print(f"---------------------------------------")
+# print(f"last_layer_after_values_for_tI: {last_layer_after_values_for_tI}\n")
+# print(f"---------------------------------------\n")
 
 print(f"---------------------------------------\n")
 print(
@@ -106,6 +106,13 @@ PrintUtils.print_table(
     ["Last layer values (input I)"],
     [[num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"]],
 )
+
+SaveAnalyse.save_analyse(
+    ["Number of covered neurons", "Total number of neurons", "Coverage"],
+    "Last layer values (input I)",
+    [num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"],
+)
+
 print(f"\n---------------------------------------\n")
 
 print(f"---------------------------------------")
@@ -120,6 +127,12 @@ PrintUtils.print_table(
     ["All layers values (input I)"],
     [[num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"]],
 )
+SaveAnalyse.save_analyse(
+    ["Number of covered neurons", "Total number of neurons", "Coverage"],
+    "All layers values (input I)",
+    [num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"],
+)
+
 print(f"\n---------------------------------------\n")
 
 print(f"---------------------------------------")
@@ -138,6 +151,15 @@ PrintUtils.print_table(
             total_neurons,
             "{:.2f}".format(coverage * 100) + "%",
         ]
+    ],
+)
+SaveAnalyse.save_analyse(
+    ["Number of covered neurons", "Total number of neurons", "Coverage"],
+    "All layers values (input II)",
+    [
+        num_of_covered_neurons,
+        total_neurons,
+        "{:.2f}".format(coverage * 100) + "%",
     ],
 )
 print(f"---------------------------------------\n")
@@ -170,6 +192,21 @@ PrintUtils.print_table(
         ]
     ],
 )
+SaveAnalyse.save_analyse(
+    [
+        "Threshold value",
+        "Number of covered neurons (> threshold)",
+        "Total number of neurons",
+        "Coverage",
+    ],
+    "Last layer values (input I)",
+    [
+        0.1,
+        num_of_th_covered_neurons,
+        total_neurons,
+        "{:.2f}".format(th_coverage * 100) + "%",
+    ],
+)
 print(f"---------------------------------------\n")
 
 print(f"---------------------------------------")
@@ -195,6 +232,21 @@ PrintUtils.print_table(
             total_neurons,
             "{:.2f}".format(th_coverage * 100) + "%",
         ]
+    ],
+)
+SaveAnalyse.save_analyse(
+    [
+        "Threshold value",
+        "Number of covered neurons (> threshold)",
+        "Total number of neurons",
+        "Coverage",
+    ],
+    "All layers values (input I)",
+    [
+        0.1,
+        num_of_th_covered_neurons,
+        total_neurons,
+        "{:.2f}".format(th_coverage * 100) + "%",
     ],
 )
 print(f"---------------------------------------\n")
@@ -238,6 +290,21 @@ PrintUtils.print_table(
         ]
     ],
 )
+SaveAnalyse.save_analyse(
+    [
+        "How many inputs are there?",
+        "Number of covered neurons",
+        "Total number of neurons",
+        "Coverage",
+    ],
+    "All layers values",
+    [
+        len(activation_infos_arr),
+        num_of_covered_neurons,
+        total_neurons,
+        "{:.2f}".format(coverage * 100) + "%",
+    ],
+)
 print(f"---------------------------------------\n")
 
 print(f"---------------------------------------")
@@ -245,7 +312,7 @@ print(f"NeuralNetworkProfiler.get_counter_dict_of_model:\n")
 counter_dict_of_model = NeuralNetworkProfiler.get_counter_dict_of_model(
     model, batch[2].unsqueeze(0)
 )
-print(f"counter_dict_of_model: {counter_dict_of_model}")
+# print(f"counter_dict_of_model: {counter_dict_of_model}")
 # NOT: Bu kısıma çıktı olarak bir nöronların kaçının verdilerin test girdi sayısının yüzde 25/50/75 sinden fazlasında
 # aktifleştirildiği gibi değerleri gösteren bir tablo eklenebilir.
 print(f"---------------------------------------\n")
@@ -438,6 +505,21 @@ PrintUtils.print_table(
         ]
     ],
 )
+SaveAnalyse.save_analyse(
+    [
+        "K value",
+        "Sum of Top-K neurons",
+        "Number of selected neurons",
+        "Mean of Top-K neurons",
+    ],
+    "Top-K coverage",
+    [
+        5,
+        "{:.2f}".format(tknc_sum),
+        num_of_selected_neurons,
+        "{:.2f}".format(mean_top_k),
+    ],
+)
 print(f"---------------------------------------\n")
 
 print(f"---------------------------------------")
@@ -461,6 +543,19 @@ PrintUtils.print_table(
             total_neurons,
             "{:.2f}".format(nbc_coverage * 100) + "%",
         ]
+    ],
+)
+SaveAnalyse.save_analyse(
+    [
+        "NBC counter",
+        "Number of total neurons",
+        "Coverage",
+    ],
+    "Neuron boundary coverage",
+    [
+        nbc_counter,
+        total_neurons,
+        "{:.2f}".format(nbc_coverage * 100) + "%",
     ],
 )
 print(f"---------------------------------------\n")
