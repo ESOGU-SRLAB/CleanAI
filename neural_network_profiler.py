@@ -38,6 +38,35 @@ class NeuralNetworkProfiler:
             input = layer_result
 
     @staticmethod
+    def get_model_info(model):
+        model_info = {}
+
+        # Modelin adını ve türünü kaydetme
+        model_info['name'] = type(model).__name__
+
+        # Modelin parametre sayısını kaydetme
+        total_params = sum(p.numel() for p in model.parameters())
+        model_info['total_params'] = total_params
+
+        # Modelin katmanlarını ve katman sayısını kaydetme
+        layers = []
+        num_layers = 0
+        for name, module in model.named_modules():
+            if isinstance(module, torch.nn.Module):
+                layers.append(name)
+                num_layers += 1
+        model_info['layers'] = layers
+        model_info['num_layers'] = num_layers
+
+        # Modelin optimizer ve kayıp fonksiyonunu kaydetme (varsa)
+        if hasattr(model, 'optimizer'):
+            model_info['optimizer'] = type(model.optimizer).__name__
+        if hasattr(model, 'criterion'):
+            model_info['criterion'] = type(model.criterion).__name__
+
+        return model_info
+
+    @staticmethod
     def get_activation_info(model, test_input):
         model = copy.deepcopy(model)
 

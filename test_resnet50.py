@@ -1,20 +1,16 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-import matplotlib.pyplot as plt
 from PIL import Image
 import requests
-import numpy as np
-from torchvision.datasets import FashionMNIST
-from torchvision.transforms import ToTensor
-from save_analize_reports import SaveAnalyse
 
 from neural_network_profiler import NeuralNetworkProfiler
 from coverage import Coverage
 from coverage_utils import CoverageUtils
 from model_architecture_utils import ModelArchitectureUtils
-from print_utils import PrintUtils
-from dataset import Dataset
+from print_utils import PrintUtils, PDFTableGenerator
+from driver import Driver
+from definitions import *
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print(f"Using {device} for inference")
@@ -60,6 +56,24 @@ for uri, result in zip(uris, results):
     # print(result)
 
 # ---------------------------------------
+# This section allows the general information of the model to be saved and presented to the user.
+
+pdf_generator = PDFTableGenerator("ResNET50_Analysis.pdf")
+model_info = NeuralNetworkProfiler.get_model_info(model)
+
+table_title = MODEL_INFORMATIONS_TITLE()
+table_description = MODEL_INFORMATIONS_DESCRIPTION(model_info["name"])
+column_headers = MODEL_INFORMATIONS_COL_HEADERS()
+row_headers = MODEL_INFORMATIONS_ROW_HEADERS()
+table_data = MODEL_INFORMATIONS_TABLE_DATA(
+    model_info["name"], model_info["total_params"], model_info["num_layers"]
+)
+
+pdf_generator.add_table(
+    table_data, column_headers, row_headers, table_title, table_description
+)
+pdf_generator.generate_pdf()
+
 
 activation_info_for_tI = NeuralNetworkProfiler.get_activation_info(
     model, batch[0].unsqueeze(0)
@@ -107,11 +121,6 @@ PrintUtils.print_table(
     [[num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"]],
 )
 
-SaveAnalyse.save_analyse(
-    ["Number of covered neurons", "Total number of neurons", "Coverage"],
-    "Last layer values (input I)",
-    [num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"],
-)
 
 print(f"\n---------------------------------------\n")
 
@@ -127,7 +136,7 @@ PrintUtils.print_table(
     ["All layers values (input I)"],
     [[num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"]],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     ["Number of covered neurons", "Total number of neurons", "Coverage"],
     "All layers values (input I)",
     [num_of_covered_neurons, total_neurons, "{:.2f}".format(coverage * 100) + "%"],
@@ -153,7 +162,7 @@ PrintUtils.print_table(
         ]
     ],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     ["Number of covered neurons", "Total number of neurons", "Coverage"],
     "All layers values (input II)",
     [
@@ -192,7 +201,7 @@ PrintUtils.print_table(
         ]
     ],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     [
         "Threshold value",
         "Number of covered neurons (> threshold)",
@@ -234,7 +243,7 @@ PrintUtils.print_table(
         ]
     ],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     [
         "Threshold value",
         "Number of covered neurons (> threshold)",
@@ -290,7 +299,7 @@ PrintUtils.print_table(
         ]
     ],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     [
         "How many inputs are there?",
         "Number of covered neurons",
@@ -505,7 +514,7 @@ PrintUtils.print_table(
         ]
     ],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     [
         "K value",
         "Sum of Top-K neurons",
@@ -545,7 +554,7 @@ PrintUtils.print_table(
         ]
     ],
 )
-SaveAnalyse.save_analyse(
+SaveAnalysis.save_analysis(
     [
         "NBC counter",
         "Number of total neurons",
