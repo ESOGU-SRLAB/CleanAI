@@ -8,6 +8,7 @@ import torch.nn as nn
 from driver import Driver
 from custom_dataset import CustomDataset
 from print_utils import PDFWriter
+from image_loader import ImageLoader
 from definitions import *
 
 # Device
@@ -46,19 +47,34 @@ pdf_file_name = "Analysis_FashionMNIST.pdf"
 pdf_writer = PDFWriter(pdf_file_name)
 pdf_writer.add_text("CleanAI Analysis Report", font_size=20, is_bold=True)
 
-# FashionMNIST veri setinin CSV dosyasının yolu
-data_file = "fashion-mnist_test.csv"
-
-# CustomDataset sınıfını kullanarak veri setini oluşturun
-custom_dataset = CustomDataset(data_file, (1, 28, 28), torch.float32)
 
 # FashionMNIST modelini yükleme
 model = torch.load("./model_fashion_1.pth")
-input_idx = 25
-sample, label = custom_dataset.get_data(input_idx)
+
+# FashionMNIST veri setini yükleme
+image_loader = ImageLoader("./test")
+sample, random_image_name = image_loader.get_random_input()
+
+
+# FashionMNIST sınıf etiketleri
+class_labels = [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot",
+]
+
+# Tahmin edilen sınıf etiketi ve ilgili olasılığı
+print(model(sample))
 
 # Driver sınıfını kullanarak modeli ve veri setini kullanarak bir sürücü oluşturun
-driver = Driver(model, custom_dataset)
+driver = Driver(model)
 
 # Modelin bilgilerini alın
 model_info = driver.get_model_informations()
@@ -100,19 +116,18 @@ data = [
         "Mean of layer",
     ]
 ]
-coverage_values_of_layers = driver.get_coverage_of_layers(input_idx)
-mean_of_layer = coverage_values_of_layers[0][2]
+coverage_values_of_layers = driver.get_coverage_of_layers(sample)
 pdf_writer.add_text(
-    "Coverage Values of Layers Mean Value = " + str(mean_of_layer),
+    "Coverage Values of Layers",
     font_size=16,
     is_bold=True,
 )
 pdf_writer.add_text(
     f"The table below shows coverage values about the '"
     + model_info["name"]
-    + "' model's all layers. NOTE: The coverage value of a layer is the ratio of the number of covered neurons to the total number of neurons in that layer. The values in the table below, it was formed as a result of giving the "
-    + str(input_idx)
-    + "th input in the data set to the model.",
+    + "' model's all layers. The 'mean of layer' value shows the average of neurons in that layer. When calculating the number of covered neurons, this value is accepted as the threshold value for that layer. NOTE: The coverage value of a layer is the ratio of the number of covered neurons to the total number of neurons in that layer. The values in the table below, it was formed as a result of giving the '"
+    + random_image_name
+    + "' input in the data set to the model.",
     font_size=14,
     is_bold=False,
 )
@@ -133,13 +148,11 @@ for idx, (
             str(num_of_covered_neurons),
             str(total_neurons),
             f"{coverage * 100:.2f}%",
-            str(mean_of_layer),
+            f"{mean_of_layer:.2f}",
         ]
     )
 
-num_of_covered_neurons, total_neurons, coverage = driver.get_coverage_of_model(
-    input_idx
-)
+num_of_covered_neurons, total_neurons, coverage = driver.get_coverage_of_model(sample)
 data.append(
     [
         "All model",
@@ -173,15 +186,15 @@ pdf_writer.add_text(
 pdf_writer.add_text(
     f"The table below shows threshold coverage values about the '"
     + model_info["name"]
-    + "' model's all layers. NOTE: The threshold coverage value of a layer is the ratio of the number of covered neurons (number of neurons greater than the threshold value) to the total number of neurons in that layer. The values in the table below, it was formed as a result of giving the "
-    + str(input_idx)
-    + "th input in the data set to the model.",
+    + "' model's all layers. NOTE: The threshold coverage value of a layer is the ratio of the number of covered neurons (number of neurons greater than the threshold value) to the total number of neurons in that layer. The values in the table below, it was formed as a result of giving the '"
+    + random_image_name
+    + "' input in the data set to the model.",
     font_size=14,
     is_bold=False,
 )
 pdf_writer.add_space(5)
 
-coverage_values_of_layers = driver.get_th_coverage_of_layers(input_idx, threshold_value)
+coverage_values_of_layers = driver.get_th_coverage_of_layers(sample, threshold_value)
 for idx, (
     layer_index,
     activation_fn,
@@ -200,7 +213,68 @@ for idx, (
     )
 
 num_of_covered_neurons, total_neurons, coverage = driver.get_th_coverage_of_model(
-    input_idx, threshold_value
+    sample, threshold_value
+)
+data.append(
+    [
+        "All model",
+        "-",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+pdf_writer.add_table(data)
+pdf_writer.add_space(20)
+# Modelin katmanlarının kapsamını PDF'e kaydedin (threshold coverage)
+threshold_value = 0.75
+
+data = [
+    [
+        "Layer index",
+        "Activation function",
+        "Number of covered neurons",
+        "Number of total neurons",
+        "Coverage value",
+    ]
+]
+
+pdf_writer.add_text(
+    "Threshold Coverage Values of Layers (TH = " + str(threshold_value) + ")",
+    font_size=16,
+    is_bold=True,
+)
+pdf_writer.add_text(
+    f"The table below shows threshold coverage values about the '"
+    + model_info["name"]
+    + "' model's all layers. NOTE: The threshold coverage value of a layer is the ratio of the number of covered neurons (number of neurons greater than the threshold value) to the total number of neurons in that layer. The values in the table below, it was formed as a result of giving the '"
+    + random_image_name
+    + "' input in the data set to the model.",
+    font_size=14,
+    is_bold=False,
+)
+pdf_writer.add_space(5)
+
+coverage_values_of_layers = driver.get_th_coverage_of_layers(sample, threshold_value)
+for idx, (
+    layer_index,
+    activation_fn,
+    num_of_covered_neurons,
+    total_neurons,
+    coverage,
+) in enumerate(coverage_values_of_layers):
+    data.append(
+        [
+            "Layer " + str(layer_index),
+            str(activation_fn),
+            str(num_of_covered_neurons),
+            str(total_neurons),
+            f"{coverage * 100:.2f}%",
+        ]
+    )
+
+num_of_covered_neurons, total_neurons, coverage = driver.get_th_coverage_of_model(
+    sample, threshold_value
 )
 data.append(
     [

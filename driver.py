@@ -1,20 +1,16 @@
-from dataset import Dataset
-from custom_dataset import CustomDataset
 from coverage import Coverage
 from neural_network_profiler import NeuralNetworkProfiler
 from model_architecture_utils import ModelArchitectureUtils
 
 
 class Driver:
-    def __init__(self, model, custom_dataset) -> None:
+    def __init__(self, model) -> None:
         self.model = model
-        self.custom_dataset = custom_dataset
 
     def get_model_informations(self):
         return NeuralNetworkProfiler.get_model_info(self.model)
 
-    def get_coverage_of_layer(self, input_idx, layer_index):
-        sample, label = self.custom_dataset[input_idx]
+    def get_coverage_of_layer(self, sample, layer_index):
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
         layer_after_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
             activation_info, layer_index
@@ -29,9 +25,8 @@ class Driver:
 
         return (num_of_covered_neurons, total_neurons, coverage)
 
-    def get_coverage_of_layers(self, input_idx):
+    def get_coverage_of_layers(self, sample):
         result = []
-        sample, label = self.custom_dataset[input_idx]
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
 
         for layer_index in range(len(activation_info)):
@@ -61,8 +56,7 @@ class Driver:
 
         return result
 
-    def get_coverage_of_model(self, input_idx):
-        sample, label = self.custom_dataset[input_idx]
+    def get_coverage_of_model(self, sample):
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
         layer_after_values = ModelArchitectureUtils.get_after_values_for_all_layers(
             activation_info
@@ -76,8 +70,7 @@ class Driver:
 
         return (num_of_covered_neurons, total_neurons, coverage)
 
-    def get_th_coverage_of_layer(self, input_idx, layer_index, threshold_value):
-        sample, label = self.custom_dataset[input_idx]
+    def get_th_coverage_of_layer(self, sample, layer_index, threshold_value):
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
         layer_after_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
             activation_info, layer_index
@@ -93,9 +86,8 @@ class Driver:
 
         return (num_of_covered_neurons, total_neurons, coverage)
 
-    def get_th_coverage_of_layers(self, input_idx, threshold_value):
+    def get_th_coverage_of_layers(self, sample, threshold_value):
         result = []
-        sample, label = self.custom_dataset[input_idx]
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
 
         for layer_index in range(len(activation_info)):
@@ -125,8 +117,7 @@ class Driver:
 
         return result
 
-    def get_th_coverage_of_model(self, input_idx, threshold_value):
-        sample, label = self.custom_dataset[input_idx]
+    def get_th_coverage_of_model(self, sample, threshold_value):
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
         layer_after_values = ModelArchitectureUtils.get_after_values_for_all_layers(
             activation_info

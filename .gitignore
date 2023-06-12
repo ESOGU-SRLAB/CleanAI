@@ -133,4 +133,6 @@ saved_models/
 data/
 .vscode/
 
+test/
+train/
 
