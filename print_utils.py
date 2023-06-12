@@ -1,6 +1,6 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
 class PrintUtils:
@@ -59,76 +59,63 @@ class PrintUtils:
             print("\033[1m" + "-" * (longest_header_length) + "\033[0m")
 
 
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
+class PDFWriter:
+    def __init__(self, filename):
+        self.filename = filename
+        self.doc = SimpleDocTemplate(self.filename, pagesize=letter)
+        self.story = []
 
-class PDFTableGenerator:
-    def __init__(self, pdf_title):
-        self.pdf_title = pdf_title
-        self.page_content = []
-
-    def add_table(self, table_data, column_headers, row_headers, table_title, table_description):
-        # Tablo boyutunu hesaplama
-        num_rows = len(table_data)
-        num_cols = len(table_data[0])
-
-        # Tablo verisini düzenleme
-        if len(row_headers) != num_rows:
-            raise ValueError("Number of row headers does not match the number of rows in table data.")
-
-        if len(column_headers) != num_cols:
-            raise ValueError("Number of column headers does not match the number of columns in table data.")
-
-        data = [[None] + column_headers]  # Tablo verisinin başına sütun başlıklarını ekliyoruz
-
-        for i, row_header in enumerate(row_headers):
-            if len(table_data[i]) != num_cols:
-                raise ValueError("Number of values in a row does not match the number of columns in table data.")
-
-            row = [row_header] + table_data[i]
-            data.append(row)
-
-        # Tablo oluşturma
-        table = Table(data, repeatRows=1)
-
-        # Tablo stilini belirleme
-        table_style = TableStyle([
+    def _create_table(self, matrix):
+        table_data = []
+        style = TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Tüm hücrelerin dikey hizalamasını ortala
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ])
 
-        # Sütun başlıklarını gri renkte ekleme
-        table_style.add('BACKGROUND', (0, 0), (0, -1), colors.lightgrey)
+        style.add('BACKGROUND', (0, 0), (0, -1), colors.lightgrey)
+        style.add('BACKGROUND', (1, 0), (-1, 0), colors.lightgrey)
 
-        # Satır başlıklarını gri renkte ekleme
-        table_style.add('BACKGROUND', (1, 0), (-1, 0), colors.lightgrey)
 
-        table.setStyle(table_style)
 
-        # Tablo açıklamasını oluşturma
+        for row in matrix:
+            table_data.append(row)
+
+        t = Table(table_data)
+
+        t.setStyle(style)
+
+        self.story.append(t)
+
+    def _create_text(self, text, font_size=12, is_bold=False):
         styles = getSampleStyleSheet()
-        table_title = Paragraph(f"<font size='16'><b>{table_title}</b></font>", styles['Normal'])
-        table_desc = Paragraph(f"<br/>{table_description}<br/><br/>", styles['Normal'])
+        style = styles['Normal']
 
-        # Sayfa içeriğine tablo ve açıklamayı ekleme
-        self.page_content.append(table_title)
-        self.page_content.append(table_desc)
-        self.page_content.append(table)
+        if is_bold:
+            style = styles['Heading1']
 
-    def generate_pdf(self):
-        # PDF dosyasını oluşturma
-        doc = SimpleDocTemplate(self.pdf_title, pagesize=letter)
+        p = Paragraph(text, style)
+        self.story.append(p)
 
-        # Sayfa içeriğini oluşturma
-        content = []
-        content.extend(self.page_content)
+    def _create_space(self, height):
+        spacer = Spacer(1, height)
+        self.story.append(spacer)
 
-        # PDF dosyasına içeriği ekleme
-        doc.build(content)
 
+    def add_table(self, matrix):
+        self._create_table(matrix)
+
+    def add_text(self, text, font_size=12, is_bold=False):
+        self._create_text(text, font_size, is_bold)
+
+    def save(self):
+        self.doc.build(self.story)
+        print(f"PDF saved as {self.filename}")
+
+    def add_space(self, height):
+        self._create_space(height)
