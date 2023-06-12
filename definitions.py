@@ -54,10 +54,11 @@ def MODEL_COVERAGE_COL_HEADERS():
 def MODEL_COVERAGE_TABLE_ONE_ROW(
     layer_index, num_of_covered_neurons, total_neurons, coverage
 ):
-    return [
+    return (
+        [
             str(layer_index),
             str(num_of_covered_neurons),
             str(total_neurons),
             str(coverage),
         ],
-    
+    )

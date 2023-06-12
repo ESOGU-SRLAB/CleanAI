@@ -111,6 +111,7 @@ print(
     f"Coverage.get_neuron_coverage_for_single_layer (last_layer (for test input I)):\n"
 )
 (
+    _,
     num_of_covered_neurons,
     total_neurons,
     coverage,

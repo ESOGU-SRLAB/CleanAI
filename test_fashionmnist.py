@@ -89,7 +89,6 @@ pdf_writer.add_space(20)
 # Modelin katmanlarının kapsamını hesaplayın (Neuron coverage layer by layer)
 
 
-
 # Modelin katmanlarının kapsamını PDF'e kaydedin (neuron coverage)
 data = [
     [
@@ -98,10 +97,16 @@ data = [
         "Number of covered neurons",
         "Number of total neurons",
         "Coverage value",
+        "Mean of layer",
     ]
 ]
-
-pdf_writer.add_text("Coverage Values of Layers", font_size=16, is_bold=True)
+coverage_values_of_layers = driver.get_coverage_of_layers(input_idx)
+mean_of_layer = coverage_values_of_layers[0][2]
+pdf_writer.add_text(
+    "Coverage Values of Layers Mean Value = " + str(mean_of_layer),
+    font_size=16,
+    is_bold=True,
+)
 pdf_writer.add_text(
     f"The table below shows coverage values about the '"
     + model_info["name"]
@@ -113,10 +118,10 @@ pdf_writer.add_text(
 )
 pdf_writer.add_space(5)
 
-coverage_values_of_layers = driver.get_coverage_of_layers(input_idx)
 for idx, (
     layer_index,
     activation_fn,
+    mean_of_layer,
     num_of_covered_neurons,
     total_neurons,
     coverage,
@@ -128,6 +133,7 @@ for idx, (
             str(num_of_covered_neurons),
             str(total_neurons),
             f"{coverage * 100:.2f}%",
+            str(mean_of_layer),
         ]
     )
 
@@ -147,7 +153,7 @@ pdf_writer.add_table(data)
 pdf_writer.add_space(20)
 
 # Modelin katmanlarının kapsamını PDF'e kaydedin (threshold coverage)
-threshold_value = 0.75
+threshold_value = 0
 
 data = [
     [

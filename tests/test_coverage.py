@@ -35,6 +35,7 @@ after_values_all_layers = ModelArchitectureUtils.get_after_values_for_all_layers
 print(f"---------------------------------------\n")
 print(f"Get neuron coverage for single layer: \n")
 (
+    _,
     num_of_covered_neurons,
     total_neurons,
     neuron_coverage,
@@ -62,7 +63,7 @@ print(f"Get threshold coverage for single layer: \n")
     num_of_th_covered_neurons,
     total_neurons,
     threshold_coverage,
-) = Coverage.get_threshold_coverage_for_single_layer(after_values)
+) = Coverage.get_threshold_coverage_for_single_layer(after_values, 0)
 print(
     f"Num of threshold covered neurons: {num_of_th_covered_neurons}\nNum of total neurons: {total_neurons}\nThreshold coverage: {threshold_coverage}"
 )

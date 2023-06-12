@@ -19,6 +19,7 @@ class Coverage:
         )
 
         return (
+            mean_of_layer,
             num_of_covered_neurons_in_layer,
             total_neurons_in_layer,
             num_of_covered_neurons_in_layer / total_neurons_in_layer,
@@ -31,6 +32,7 @@ class Coverage:
 
         for layer in layers:
             (
+                _,
                 num_of_covered_neurons_in_layer,
                 total_neurons_in_layer,
                 _,

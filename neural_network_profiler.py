@@ -42,11 +42,11 @@ class NeuralNetworkProfiler:
         model_info = {}
 
         # Modelin adını ve türünü kaydetme
-        model_info['name'] = type(model).__name__
+        model_info["name"] = type(model).__name__
 
         # Modelin parametre sayısını kaydetme
         total_params = sum(p.numel() for p in model.parameters())
-        model_info['total_params'] = total_params
+        model_info["total_params"] = total_params
 
         # Modelin katmanlarını ve katman sayısını kaydetme
         layers = []
@@ -55,14 +55,14 @@ class NeuralNetworkProfiler:
             if isinstance(module, torch.nn.Module):
                 layers.append(name)
                 num_layers += 1
-        model_info['layers'] = layers
-        model_info['num_layers'] = num_layers
+        model_info["layers"] = layers
+        model_info["num_layers"] = num_layers
 
         # Modelin optimizer ve kayıp fonksiyonunu kaydetme (varsa)
-        if hasattr(model, 'optimizer'):
-            model_info['optimizer'] = type(model.optimizer).__name__
-        if hasattr(model, 'criterion'):
-            model_info['criterion'] = type(model.criterion).__name__
+        if hasattr(model, "optimizer"):
+            model_info["optimizer"] = type(model.optimizer).__name__
+        if hasattr(model, "criterion"):
+            model_info["criterion"] = type(model.criterion).__name__
 
         return model_info
 
