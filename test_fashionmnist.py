@@ -57,7 +57,8 @@ sample, random_image_name = image_loader.get_random_input()
 sample_II, random_image_name_II = image_loader.get_random_input()
 
 samples = []
-for i in range(10):
+how_many_samples = 30
+for i in range(how_many_samples):
     sample, random_image_name = image_loader.get_random_input()
     samples.append(sample)
 

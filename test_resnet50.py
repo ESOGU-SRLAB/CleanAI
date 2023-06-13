@@ -26,6 +26,13 @@ pdf_writer.add_text("CleanAI Analysis Report", font_size=20, is_bold=True)
 # FashionMNIST veri setini yükleme
 image_loader = ImageLoader("./resnet50_samples")
 sample, random_image_name = image_loader.get_random_input()
+sample_II, random_image_name_II = image_loader.get_random_input()
+
+how_many_samples = 10
+samples = []
+for i in range(10):
+    sample, random_image_name = image_loader.get_random_input()
+    samples.append(sample)
 
 
 # Tahmin edilen sınıf etiketi ve ilgili olasılığı
@@ -76,7 +83,7 @@ data = [
 ]
 coverage_values_of_layers = driver.get_coverage_of_layers(sample)
 pdf_writer.add_text(
-    "Coverage Values of Layers",
+    "Coverage Values of Layers (For Only One Input)",
     font_size=16,
     is_bold=True,
 )
@@ -115,6 +122,46 @@ data.append(
     [
         "All model",
         "-",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+pdf_writer.add_table(data)
+pdf_writer.add_space(20)
+
+# Modelin katmanlarının kapsamını PDF'e kaydedin (neuron coverage for multiple inputs)
+data = [
+    [
+        "Layer index",
+        "Number of covered neurons",
+        "Number of total neurons",
+        "Coverage value",
+    ]
+]
+(
+    num_of_covered_neurons,
+    total_neurons,
+    coverage,
+) = driver.get_average_coverage_of_model(samples)
+pdf_writer.add_text(
+    "Coverage Values of Layers (For Multiple Inputs) " + str(len(samples)) + " Inputs",
+    font_size=16,
+    is_bold=True,
+)
+pdf_writer.add_text(
+    f"The table below shows coverage values for multiple inputs about the '"
+    + model_info["name"]
+    + "' model. The values in the table below, it was formed as a result of giving the '"
+    + str(len(samples))
+    + "' inputs in the data set to the model.",
+    font_size=14,
+    is_bold=False,
+)
+pdf_writer.add_space(5)
+data.append(
+    [
+        "All model",
         str(num_of_covered_neurons),
         str(total_neurons),
         f"{coverage * 100:.2f}%",
@@ -243,6 +290,150 @@ data.append(
         f"{coverage * 100:.2f}%",
     ]
 )
+pdf_writer.add_table(data)
+
+pdf_writer.add_space(20)
+# Modelin Sign Coverage ve Value Coverage kapsamını PDF'e kaydedin (sign coverage & value coverage)
+threshold_value = 0.75
+
+data = [
+    [
+        "Coverage Metric",
+        "Number of covered neurons",
+        "Number of total neurons",
+        "Coverage value",
+    ]
+]
+
+pdf_writer.add_text(
+    "Sign Coverage and Value Coverage (TH = "
+    + str(threshold_value)
+    + ") Values of Model",
+    font_size=16,
+    is_bold=True,
+)
+pdf_writer.add_text(
+    f"The table below shows Sign Coverage and Value Coverage values of the '"
+    + model_info["name"]
+    + "' model. Sign Coverage: When given two different test inputs, it checks whether the signs of a specific neuron's value after the activation function are the same. If the signs are not the same, the counter is incremented. Value Coverage: When given two different test inputs, it checks whether the difference between the values of a specific neuron after the activation function is greater than the given threshold value. If the difference is greater than the threshold value, the counter is incremented. The values in the table below, it was formed as a result of giving the '"
+    + random_image_name
+    + "' and '"
+    + random_image_name_II
+    + "' input in the data set to the model.",
+    font_size=14,
+    is_bold=False,
+)
+pdf_writer.add_space(5)
+
+num_of_covered_neurons, total_neurons, coverage = driver.get_sign_coverage_of_model(
+    sample, sample_II
+)
+data.append(
+    [
+        "Sign Coverage",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+
+
+num_of_covered_neurons, total_neurons, coverage = driver.get_value_coverage_of_model(
+    sample, sample_II, threshold_value
+)
+data.append(
+    [
+        "Value Coverage",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+
+pdf_writer.add_space(5)
+pdf_writer.add_table(data)
+
+pdf_writer.add_space(20)
+# Modelin SS, SV, VS, VV kapsamını PDF'e kaydedin (SS, SV, VS, VV coverage)
+threshold_value = -5
+
+data = [
+    [
+        "Coverage Metric",
+        "Number of covered neuron pairs",
+        "Number of total neuron pairs",
+        "Coverage value",
+    ]
+]
+
+pdf_writer.add_text(
+    "SS, SV, VS and VV Coverage (TH = " + str(threshold_value) + ") Values of Model",
+    font_size=16,
+    is_bold=True,
+)
+pdf_writer.add_text(
+    f"The table below shows Sign-Sign Coverage, Sign-Value Coverage, Value-Sign Coverage and Value-Value Coverage values of the '"
+    + model_info["name"]
+    + "' model. Sign-Sign Coverage: When given two different test inputs, it checks whether the signs of a specific neuron's value after the activation function are the same. If the signs are not the same, the counter is incremented. Value Coverage: When given two different test inputs, it checks whether the difference between the values of a specific neuron after the activation function is greater than the given threshold value. If the difference is greater than the threshold value, the counter is incremented. The values in the table below, it was formed as a result of giving the '"
+    + random_image_name
+    + "' and '"
+    + random_image_name_II
+    + "' input in the data set to the model.",
+    font_size=14,
+    is_bold=False,
+)
+pdf_writer.add_space(5)
+
+# num_of_covered_neurons, total_neurons, coverage = driver.get_ss_coverage_of_model(
+#     sample, sample_II
+# )
+data.append(
+    [
+        "Sign-Sign Coverage",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+
+
+# num_of_covered_neurons, total_neurons, coverage = driver.get_sv_coverage_of_model(
+#     sample, sample_II, threshold_value
+# )
+data.append(
+    [
+        "Sign-Value Coverage",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+
+# num_of_covered_neurons, total_neurons, coverage = driver.get_vs_coverage_of_model(
+#     sample, sample_II, threshold_value
+# )
+data.append(
+    [
+        "Value-Sign Coverage",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+
+# num_of_covered_neurons, total_neurons, coverage = driver.get_vv_coverage_of_model(
+#     sample, sample_II, threshold_value
+# )
+data.append(
+    [
+        "Value-Value Coverage",
+        str(num_of_covered_neurons),
+        str(total_neurons),
+        f"{coverage * 100:.2f}%",
+    ]
+)
+
+pdf_writer.add_space(5)
 pdf_writer.add_table(data)
 
 pdf_writer.save()
