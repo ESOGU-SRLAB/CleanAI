@@ -70,6 +70,25 @@ class Driver:
 
         return (num_of_covered_neurons, total_neurons, coverage)
 
+    def get_average_coverage_of_model(self, samples):
+        after_values = []
+        for sample in samples:
+            activation_info = NeuralNetworkProfiler.get_activation_info(
+                self.model, sample
+            )
+            layer_after_values = ModelArchitectureUtils.get_after_values_for_all_layers(
+                activation_info
+            )
+            after_values.append(layer_after_values)
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_average_neuron_coverage_with_multiple_inputs(after_values)
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
     def get_th_coverage_of_layer(self, sample, layer_index, threshold_value):
         activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
         layer_after_values = ModelArchitectureUtils.get_after_values_for_specific_layer(
@@ -129,6 +148,98 @@ class Driver:
             coverage,
         ) = Coverage.get_threshold_coverage_for_all_layers(
             layer_after_values, threshold_value
+        )
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
+    def get_sign_coverage_of_model(self, sample, sample_II):
+        activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
+        activation_info_II = NeuralNetworkProfiler.get_activation_info(
+            self.model, sample_II
+        )
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_sign_coverage(activation_info, activation_info_II)
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
+    def get_value_coverage_of_model(self, sample, sample_II, threshold_value):
+        activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
+        activation_info_II = NeuralNetworkProfiler.get_activation_info(
+            self.model, sample_II
+        )
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_value_coverage(
+            activation_info, activation_info_II, threshold_value
+        )
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
+    def get_ss_coverage_of_model(self, sample, sample_II):
+        activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
+        activation_info_II = NeuralNetworkProfiler.get_activation_info(
+            self.model, sample_II
+        )
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_sign_sign_coverage(activation_info, activation_info_II)
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
+    def get_sv_coverage_of_model(self, sample, sample_II, threshold_value):
+        activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
+        activation_info_II = NeuralNetworkProfiler.get_activation_info(
+            self.model, sample_II
+        )
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_sign_value_coverage(
+            activation_info, activation_info_II, threshold_value
+        )
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
+    def get_vv_coverage_of_model(self, sample, sample_II, threshold_value):
+        activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
+        activation_info_II = NeuralNetworkProfiler.get_activation_info(
+            self.model, sample_II
+        )
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_value_value_coverage(
+            activation_info, activation_info_II, threshold_value
+        )
+
+        return (num_of_covered_neurons, total_neurons, coverage)
+
+    def get_vs_coverage_of_model(self, sample, sample_II, threshold_value):
+        activation_info = NeuralNetworkProfiler.get_activation_info(self.model, sample)
+        activation_info_II = NeuralNetworkProfiler.get_activation_info(
+            self.model, sample_II
+        )
+
+        (
+            num_of_covered_neurons,
+            total_neurons,
+            coverage,
+        ) = Coverage.get_value_sign_coverage(
+            activation_info, activation_info_II, threshold_value
         )
 
         return (num_of_covered_neurons, total_neurons, coverage)

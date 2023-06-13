@@ -15,7 +15,11 @@ class ImageLoader:
         image_list = []
         for root, dirs, files in os.walk(self.directory):
             for file in files:
-                if file.endswith(".jpg") or file.endswith(".png"):
+                if (
+                    file.endswith(".jpg")
+                    or file.endswith(".jpeg")
+                    or file.endswith(".png")
+                ):
                     image_path = os.path.relpath(
                         os.path.join(root, file), self.directory
                     )
@@ -26,6 +30,14 @@ class ImageLoader:
         random_image_path = random.choice(self.images)
         image, image_path = self.load_image(random_image_path)
         return image, image_path
+
+    def get_random_inputs(self, num_of_inputs):
+        random_image_paths = random.sample(self.images, num_of_inputs)
+        images = []
+        for random_image_path in random_image_paths:
+            image, image_path = self.load_image(random_image_path)
+            images.append((image, image_path))
+        return images
 
     def load_image(self, image_path):
         transform = transforms.Compose(

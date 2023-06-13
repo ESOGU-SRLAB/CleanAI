@@ -165,10 +165,6 @@ class Coverage:
     def how_many_times_neurons_activated(
         counter_dict, activation_infos, threshold_value=0.75
     ):
-        # counter_dict = NeuralNetworkProfiler.get_counter_dict_of_model(
-        #     model, activation_infos[0]
-        # )
-
         for activation_info in activation_infos:
             after_values_all_layers = (
                 ModelArchitectureUtils.get_after_values_for_all_layers(activation_info)
@@ -180,12 +176,6 @@ class Coverage:
                         counter_dict[str(layer_idx)]["how_many_times_activated"][
                             neuron_idx
                         ] += 1
-            # for layer_index, layer in enumerate(after_values_all_layers):
-            #     for neuron_index, neuron_value in enumerate(layer[0]):
-            #         if neuron_value > threshold_value:
-            #             temp_counter_dict[str(layer_index)]["how_many_times_activated"][
-            #                 neuron_index
-            #             ] += 1
 
         return counter_dict
 
@@ -213,27 +203,6 @@ class Coverage:
                 total_neurons += 1
 
         return covered_neurons, total_neurons, covered_neurons / total_neurons
-
-        # for k in range(len(activation_info_for_tI)):  # k specifies the layer index
-        #     after_act_fn_values = (
-        #         ModelArchitectureUtils.get_after_values_for_specific_layer(
-        #             activation_info_for_tI, k
-        #         )[0]
-        #     )
-        #     for neuron_index in range(
-        #         len(after_act_fn_values)
-        #     ):  # neuron_index specifies the i value
-        #         if CoverageUtils.is_there_sign_change(
-        #             k,
-        #             neuron_index,
-        #             activation_info_for_tI,
-        #             activation_info_for_tII,
-        #         ):
-        #             covered_neurons = covered_neurons + 1
-
-        #         total_neurons = total_neurons + 1
-
-        # return covered_neurons, total_neurons, covered_neurons / total_neurons
 
     @staticmethod
     def get_value_coverage(
