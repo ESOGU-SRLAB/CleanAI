@@ -7,9 +7,10 @@ from pathlib import Path
 
 
 class ImageLoader:
-    def __init__(self, directory):
+    def __init__(self, directory, transform):
         self.directory = directory
         self.images = self.load_images()
+        self.transform = transform
 
     def load_images(self):
         image_list = []
@@ -19,6 +20,7 @@ class ImageLoader:
                     file.endswith(".jpg")
                     or file.endswith(".jpeg")
                     or file.endswith(".png")
+                    or file.endswith(".JPEG")
                 ):
                     image_path = os.path.relpath(
                         os.path.join(root, file), self.directory
@@ -40,14 +42,27 @@ class ImageLoader:
         return images
 
     def load_image(self, image_path):
-        transform = transforms.Compose(
-            [
-                # transforms.Resize(
-                #     (224, 224)
-                # ),  # Örnek olarak görüntü boyutunu (224, 224) olarak belirledik
-                transforms.ToTensor(),
-            ]
-        )
+        # transform = transforms.Compose(
+        #     [
+        #         # transforms.Resize(
+        #         #     (224, 224)
+        #         # ),  # Örnek olarak görüntü boyutunu (224, 224) olarak belirledik
+        #         transforms.ToTensor(),
+        #     ]
+        # )
         image = Image.open(os.path.join(self.directory, image_path))
-        image_tensor = transform(image).unsqueeze(0)
+        image_tensor = self.transform(image).unsqueeze(0)
+        return image_tensor, image_path
+
+    def get_image_from_path(self, image_path):
+        # transform = transforms.Compose(
+        #     [
+        #         # transforms.Resize(
+        #         #     (224, 224)
+        #         # ),  # Örnek olarak görüntü boyutunu (224, 224) olarak belirledik
+        #         transforms.ToTensor(),
+        #     ]
+        # )
+        image = Image.open(image_path)
+        image_tensor = self.transform(image).unsqueeze(0)
         return image_tensor, image_path

@@ -79,7 +79,7 @@ class NeuralNetworkProfiler:
                 activation_info[str(consecutive_index)] = {
                     "layer_index": layer_index,
                     "act_func": module.__class__.__name__,
-                    "before_act_func_values": input[0].detach().cpu().numpy(),
+                    # "before_act_func_values": input[0].detach().cpu().numpy(),
                     "after_act_func_values": output.detach().cpu().numpy(),
                 }
 
