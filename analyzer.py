@@ -16,6 +16,7 @@ class Analyzer:
         value_cov_th,
         top_k_val,
         node_intervals,
+        ss_sv_vv_vs_cov=False,
     ):
         self.model = model
         self.image_loader = image_loader
@@ -25,6 +26,7 @@ class Analyzer:
         self.value_cov_th = value_cov_th
         self.top_k_val = top_k_val
         self.node_intervals = node_intervals
+        self.ss_sv_vv_vs_cov = ss_sv_vv_vs_cov
 
         self.model_info = self.driver.get_model_informations()
 
@@ -304,102 +306,102 @@ class Analyzer:
         self.pdf_writer.add_space(20)
 
         # Calculation of SS & SV & VS && VV of the model
-
-        data = [
-            [
-                "Coverage Metric",
-                "Number of covered neuron pairs",
-                "Number of total neuron pairs",
-                "Coverage value",
+        if self.ss_sv_vv_vs_cov:
+            data = [
+                [
+                    "Coverage Metric",
+                    "Number of covered neuron pairs",
+                    "Number of total neuron pairs",
+                    "Coverage value",
+                ]
             ]
-        ]
 
-        self.pdf_writer.add_text(
-            "SS, SV, VS and VV Coverage (TH = "
-            + str(self.value_cov_th)
-            + ") Values of Model",
-            font_size=16,
-            is_bold=True,
-        )
-        self.pdf_writer.add_text(
-            f"The table below shows Sign-Sign Coverage, Sign-Value Coverage, Value-Sign Coverage and Value-Value Coverage values of the '"
-            + self.model_info["name"]
-            + "' model. Sign-Sign Coverage: When given two different test inputs, it checks whether the signs of a specific neuron's value after the activation function are the same. If the signs are not the same, the counter is incremented. Value Coverage: When given two different test inputs, it checks whether the difference between the values of a specific neuron after the activation function is greater than the given threshold value. If the difference is greater than the threshold value, the counter is incremented. The values in the table below, it was formed as a result of giving the '"
-            + self.random_image_name
-            + "' and '"
-            + self.random_image_name_II
-            + "' input in the data set to the model.",
-            font_size=14,
-            is_bold=False,
-        )
-        self.pdf_writer.add_space(5)
+            self.pdf_writer.add_text(
+                "SS, SV, VS and VV Coverage (TH = "
+                + str(self.value_cov_th)
+                + ") Values of Model",
+                font_size=16,
+                is_bold=True,
+            )
+            self.pdf_writer.add_text(
+                f"The table below shows Sign-Sign Coverage, Sign-Value Coverage, Value-Sign Coverage and Value-Value Coverage values of the '"
+                + self.model_info["name"]
+                + "' model. Sign-Sign Coverage: When given two different test inputs, it checks whether the signs of a specific neuron's value after the activation function are the same. If the signs are not the same, the counter is incremented. Value Coverage: When given two different test inputs, it checks whether the difference between the values of a specific neuron after the activation function is greater than the given threshold value. If the difference is greater than the threshold value, the counter is incremented. The values in the table below, it was formed as a result of giving the '"
+                + self.random_image_name
+                + "' and '"
+                + self.random_image_name_II
+                + "' input in the data set to the model.",
+                font_size=14,
+                is_bold=False,
+            )
+            self.pdf_writer.add_space(5)
 
-        (
-            num_of_covered_neurons,
-            total_neurons,
-            coverage,
-        ) = self.driver.get_ss_coverage_of_model(self.sample, self.sample_II)
-        data.append(
-            [
-                "Sign-Sign Coverage",
-                str(num_of_covered_neurons),
-                str(total_neurons),
-                f"{coverage * 100:.2f}%",
-            ]
-        )
+            (
+                num_of_covered_neurons,
+                total_neurons,
+                coverage,
+            ) = self.driver.get_ss_coverage_of_model(self.sample, self.sample_II)
+            data.append(
+                [
+                    "Sign-Sign Coverage",
+                    str(num_of_covered_neurons),
+                    str(total_neurons),
+                    f"{coverage * 100:.2f}%",
+                ]
+            )
 
-        (
-            num_of_covered_neurons,
-            total_neurons,
-            coverage,
-        ) = self.driver.get_sv_coverage_of_model(
-            self.sample, self.sample_II, self.value_cov_th
-        )
-        data.append(
-            [
-                "Sign-Value Coverage",
-                str(num_of_covered_neurons),
-                str(total_neurons),
-                f"{coverage * 100:.2f}%",
-            ]
-        )
+            (
+                num_of_covered_neurons,
+                total_neurons,
+                coverage,
+            ) = self.driver.get_sv_coverage_of_model(
+                self.sample, self.sample_II, self.value_cov_th
+            )
+            data.append(
+                [
+                    "Sign-Value Coverage",
+                    str(num_of_covered_neurons),
+                    str(total_neurons),
+                    f"{coverage * 100:.2f}%",
+                ]
+            )
 
-        (
-            num_of_covered_neurons,
-            total_neurons,
-            coverage,
-        ) = self.driver.get_vs_coverage_of_model(
-            self.sample, self.sample_II, self.value_cov_th
-        )
-        data.append(
-            [
-                "Value-Sign Coverage",
-                str(num_of_covered_neurons),
-                str(total_neurons),
-                f"{coverage * 100:.2f}%",
-            ]
-        )
+            (
+                num_of_covered_neurons,
+                total_neurons,
+                coverage,
+            ) = self.driver.get_vs_coverage_of_model(
+                self.sample, self.sample_II, self.value_cov_th
+            )
+            data.append(
+                [
+                    "Value-Sign Coverage",
+                    str(num_of_covered_neurons),
+                    str(total_neurons),
+                    f"{coverage * 100:.2f}%",
+                ]
+            )
 
-        (
-            num_of_covered_neurons,
-            total_neurons,
-            coverage,
-        ) = self.driver.get_vv_coverage_of_model(
-            self.sample, self.sample_II, self.value_cov_th
-        )
-        data.append(
-            [
-                "Value-Value Coverage",
-                str(num_of_covered_neurons),
-                str(total_neurons),
-                f"{coverage * 100:.2f}%",
-            ]
-        )
+            (
+                num_of_covered_neurons,
+                total_neurons,
+                coverage,
+            ) = self.driver.get_vv_coverage_of_model(
+                self.sample, self.sample_II, self.value_cov_th
+            )
+            data.append(
+                [
+                    "Value-Value Coverage",
+                    str(num_of_covered_neurons),
+                    str(total_neurons),
+                    f"{coverage * 100:.2f}%",
+                ]
+            )
 
-        self.pdf_writer.add_space(5)
-        self.pdf_writer.add_table(data)
+            self.pdf_writer.add_space(5)
+            self.pdf_writer.add_table(data)
 
-        self.pdf_writer.add_space(20)
+            self.pdf_writer.add_space(20)
 
         # Calculation of TKNC of the model
 
