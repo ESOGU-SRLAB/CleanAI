@@ -504,26 +504,3 @@ class Coverage:
                 total_neurons = total_neurons + 1
 
         return res_arr, total_neurons
-
-    # @staticmethod
-    # # Definition of fn: Applies the 'MNC_for_single_layer' function for all layers.
-    # def MNC(node_intervals, activation_info):
-    #     res_arr = []
-
-    #     after_act_fn_values = ModelArchitectureUtils.get_after_values_for_all_layers(
-    #         activation_info
-    #     )
-
-    #     for layer_idx, layer in enumerate(after_act_fn_values):
-    #         counter_arr = Coverage.MNC_for_single_layer(
-    #             node_intervals, activation_info, layer_idx
-    #         )
-
-    #         for index in range(len(counter_arr)):
-    #             counter_arr[index] = counter_arr[
-    #                 index
-    #             ] / CoverageUtils.count_elements_above_threshold(layer, -inf)
-
-    #         res_arr.append(counter_arr)
-
-    #     return res_arr

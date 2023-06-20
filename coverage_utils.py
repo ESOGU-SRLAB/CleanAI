@@ -252,6 +252,7 @@ class CoverageUtils:
 
         return bound_dict
 
+    @staticmethod
     def count_elements_above_threshold(arr, threshold):
         flattened_arr = arr.flatten()  # Diziyi tek boyutlu hale getirme
         count = np.sum(

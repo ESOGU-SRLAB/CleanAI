@@ -42,27 +42,11 @@ class ImageLoader:
         return images
 
     def load_image(self, image_path):
-        # transform = transforms.Compose(
-        #     [
-        #         # transforms.Resize(
-        #         #     (224, 224)
-        #         # ),  # Örnek olarak görüntü boyutunu (224, 224) olarak belirledik
-        #         transforms.ToTensor(),
-        #     ]
-        # )
         image = Image.open(os.path.join(self.directory, image_path))
         image_tensor = self.transform(image).unsqueeze(0)
         return image_tensor, image_path
 
     def get_image_from_path(self, image_path):
-        # transform = transforms.Compose(
-        #     [
-        #         # transforms.Resize(
-        #         #     (224, 224)
-        #         # ),  # Örnek olarak görüntü boyutunu (224, 224) olarak belirledik
-        #         transforms.ToTensor(),
-        #     ]
-        # )
         image = Image.open(image_path)
         image_tensor = self.transform(image).unsqueeze(0)
         return image_tensor, image_path
