@@ -11,9 +11,6 @@ The document includes the following titles:
 - [Credits](#credits)
 - [License](#license)
 
-## Installation
-
-
 ## What is CleanAI?
 CleanAI is a white-box testing library that utilizes coverage metrics to evaluate the structural analysis, quality, and reliability parameters of DNN models. The library incorporates eleven coverage test methods and enables developers to perform essential model analyses and generate output reports. By using CleanAI, developers can effectively evaluate the quality of DNNs and make informed decisions.
 
