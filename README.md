@@ -174,8 +174,17 @@ analyze = Analyzer(
 analyzer.analyze()
 ```
 
+Output values will be produced as a result of running the 'main.py' file.
+
+```
+python main.py
+```
+
 After the processes are completed, a file named 'Analysis_[MODEL_NAME].pdf' will be created with analysis outputs.
 
 ![Report with analysis outputs](https://i.ibb.co/PNxrTwJ/Screenshot-2023-06-20-115928.png "Report with analysis outputs")
 
+## Credits
+
+## Licence
 
