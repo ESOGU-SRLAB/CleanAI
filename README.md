@@ -1,4 +1,5 @@
 # CleanAI - Evaluation of Deep Neural Network Quality by CleanAI Coverage Metrics Library
+![lang](https://img.shields.io/github/languages/top/inomuh/imfit)
 
 ## Contents
 
@@ -43,6 +44,8 @@ Within the scope of this study, our CleanAI library measures various coverage me
 **Value-Value Coverage:** This coverage criterion encompasses the values of the inputs. It targets different value ranges for each input component. This criterion aims to understand how the neural network behaves with different values. It can be measured by modifying the values of the components in the input data and observing the outputs of the neural network.
 
 ## Installation
+First, you need to install Python on your device. Recommended Python version: > 3.8 [Python](https://www.python.org/)
+
 In order for the library to run, the necessary dependencies must be installed.
 ```
 pip install -r requirements.txt
@@ -51,7 +54,7 @@ pip install -r requirements.txt
 ## Usage
 First, save your model that you have prepared using PyTorch. This model can be found in another directory and add the saved model to the main directory within the CleanAI project.
 
-**_How to save a prepared model using PyTorch? (Ref: PyTorch Tutorial)_**
+**_How to save a prepared model using PyTorch? (Ref: [PyTorch Tutorials](https://pytorch.org/tutorials/))_**
 ```
 torch.save(model, PATH)
 ```
@@ -87,6 +90,16 @@ class NeuralNetwork(nn.Module):
 ```
 model = NeuralNetwork()
 model = torch.load("./test_model.pth")
+```
+
+**_If the model is to be uploaded via Torch Hub:_**
+
+If the model is to be loaded from the Torch Hub rather than from the local directory, the following lines of code should be followed. The following code block shows how to load the ResNet18 model as an example.
+
+```
+import torch
+
+model = torch.hub.load('pytorch/vision:v0.9.0', 'resnet18', pretrained=True)
 ```
 
 In the next stage, the preparation of the data set and transformer to be given to the model comes.
