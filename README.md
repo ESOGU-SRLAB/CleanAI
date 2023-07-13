@@ -50,7 +50,7 @@ First of all, Git system must be installed on the local machine in order to clon
 git clone https://github.com/ESOGU-SRLAB/CleanAI.git
 ```
 
-First, you need to install Python on your device. Recommended Python version: > 3.8 
+Then, you need to install Python on your device. Recommended Python version: > 3.8 
 For any operating operating system, you can download the Python installation file from this link or or you can follow the installation instructions and complete the installation steps. Python will be activated as a result of installing the file downloaded from this link on the local machine: [Python Download](https://www.python.org/downloads/)
 
 In order for the library to run, the necessary dependencies must be installed. As a result of running the following command in the terminal on the project directory, the necessary dependencies will be installed automatically.
