@@ -210,22 +210,22 @@ After the processes are completed, a file named 'Analysis_[MODEL_NAME].pdf' will
 You can access the social media accounts of our teammates who supported the development phase from the links below.
 
 - Osman Çağlar <a href="https://www.linkedin.com/in/osmancaglar/" rel="nofollow noreferrer">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="linkedin">
   </a> &nbsp;
 - Abdul Hannan Ayubi <a href="https://www.linkedin.com/in/abdulhannanayubi/" rel="nofollow noreferrer">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="linkedin">
   </a> &nbsp;
 - Furkan Taşkın <a href="https://www.linkedin.com/in/furkan-taskin/" rel="nofollow noreferrer">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="linkedin">
   </a> &nbsp;
 - Sergen Aşık <a href="https://www.linkedin.com/in/sergenasik/" rel="nofollow noreferrer">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="linkedin">
   </a> &nbsp;
 - Cem Bağlum <a href="https://www.linkedin.com/in/cembaglum/" rel="nofollow noreferrer">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="linkedin">
   </a> &nbsp;
 - Dr. Uğur Yayan <a href="https://www.linkedin.com/in/uguryayan/" rel="nofollow noreferrer">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="linkedin">
   </a> &nbsp; 
 
 ## Credits
