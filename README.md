@@ -207,14 +207,14 @@ After the processes are completed, a file named 'Analysis_[MODEL_NAME].pdf' will
 ![Report with analysis outputs](https://i.ibb.co/PNxrTwJ/Screenshot-2023-06-20-115928.png "Report with analysis outputs")
 
 ## Collobrators
-- Osman Çağlar <a href="[https://www.linkedin.com/[removed]](https://www.linkedin.com/in/osmancaglar/)" rel="nofollow noreferrer">
-    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> LinkedIn
+- Osman Çağlar <a href="https://www.linkedin.com/in/osmancaglar/" rel="nofollow noreferrer">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin"> LinkedIn
   </a> &nbsp;
 - Abdul Hannan Ayubi <a href="https://www.linkedin.com/in/abdulhannanayubi/" rel="nofollow noreferrer">
-    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> LinkedIn
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin"> LinkedIn
   </a> &nbsp;
 - Furkan Taşkın <a href="https://www.linkedin.com/in/furkan-taskin/" rel="nofollow noreferrer">
-    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> LinkedIn
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin"> LinkedIn
   </a> &nbsp; 
 
 ## Credits
