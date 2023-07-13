@@ -9,6 +9,7 @@ The document includes the following titles:
 - [Coverage Metrics](#coveragemetrics)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Collobrators](#collobrators)
 - [Credits](#credits)
 - [License](#license)
 
@@ -44,9 +45,15 @@ Within the scope of this study, our CleanAI library measures various coverage me
 **Value-Value Coverage:** This coverage criterion encompasses the values of the inputs. It targets different value ranges for each input component. This criterion aims to understand how the neural network behaves with different values. It can be measured by modifying the values of the components in the input data and observing the outputs of the neural network.
 
 ## Installation
-First, you need to install Python on your device. Recommended Python version: > 3.8 [Python](https://www.python.org/)
+First of all, Git system must be installed on the local machine in order to clone the project to the local machine via GitHub. After completing the necessary installation instructions suitable for the operating system from the [Git Download](https://git-scm.com/downloads) address and installing Git on the local machine, the project files will be cloned on the local machine by running the following command from the terminal.
+```
+git clone https://github.com/ESOGU-SRLAB/CleanAI.git
+```
 
-In order for the library to run, the necessary dependencies must be installed.
+First, you need to install Python on your device. Recommended Python version: > 3.8 
+For any operating operating system, you can download the Python installation file from this link or or you can follow the installation instructions and complete the installation steps. Python will be activated as a result of installing the file downloaded from this link on the local machine: [Python Download](https://www.python.org/downloads/)
+
+In order for the library to run, the necessary dependencies must be installed. As a result of running the following command in the terminal on the project directory, the necessary dependencies will be installed automatically.
 ```
 pip install -r requirements.txt
 ```
@@ -116,6 +123,8 @@ transform = transforms.Compose(
     
 image_loader = ImageLoader("./samples", transform)
 ```
+
+At this stage, we would like to remind you that the definition of the variable named 'transform', which is passed as a parameter to the 'ImageLoader' class, will differ from model to model. For this, we recommend examining the documentation of the model in order to define the 'transform' variable suitable for the model to be tested and making the definition of 'transform' suitable for the model. It is important to do this step carefully in order to properly adjust the input data set to be given to the model during the analysis of the model.
 
 In the next step, it is necessary to determine the parameters to be given to the CleanAI library. The 'how_many_samples' parameter will calculate how many inputs will be taken into account during the calculation of the average coverage values, the 'th_cov_val' parameter will be the threshold value during the calculation of the threshold coverage metric, the 'value_cov_th' expression will be the threshold value during the calculation of the value coverage metric, the 'top_k_val' parameter will be the top-k During the calculation of the value coverage value, the 'k' value indicates how much the 'node_intervals' value will be, which threshold value ranges will be taken into account during the calculation of the multisection neuron coverage metric, and the last parameter passed to the 'Analyzer' is whether the SS & SV & VS & VV metrics will be calculated.
 
@@ -196,6 +205,17 @@ python main.py
 After the processes are completed, a file named 'Analysis_[MODEL_NAME].pdf' will be created with analysis outputs.
 
 ![Report with analysis outputs](https://i.ibb.co/PNxrTwJ/Screenshot-2023-06-20-115928.png "Report with analysis outputs")
+
+## Collobrators
+- Osman Çağlar <a href="[https://www.linkedin.com/[removed]](https://www.linkedin.com/in/osmancaglar/)" rel="nofollow noreferrer">
+    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> LinkedIn
+  </a> &nbsp;
+- Abdul Hannan Ayubi <a href="https://www.linkedin.com/in/abdulhannanayubi/" rel="nofollow noreferrer">
+    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> LinkedIn
+  </a> &nbsp;
+- Furkan Taşkın <a href="https://www.linkedin.com/in/furkan-taskin/" rel="nofollow noreferrer">
+    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> LinkedIn
+  </a> &nbsp; 
 
 ## Credits
 
