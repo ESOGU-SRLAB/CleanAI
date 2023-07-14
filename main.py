@@ -87,6 +87,74 @@ def analyze_maxvit():
     analyzer.analyze()
 
 
+def analyze_resnet18():
+    model = models.resnet18(pretrained=True)
+    model.eval()
+
+    transform = transforms.Compose(
+        [
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
+
+    image_loader = ImageLoader("./maxvit_dataset", transform)
+
+    how_many_samples = 50
+    th_cov_val = 0.75
+    value_cov_th = 0.75
+    top_k_val = 3
+    node_intervals = [(0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5)]
+
+    analyzer = Analyzer(
+        model,
+        image_loader,
+        how_many_samples,
+        th_cov_val,
+        value_cov_th,
+        top_k_val,
+        node_intervals,
+        False,
+    )
+    analyzer.analyze()
+
+
+def analyze_resnet34():
+    model = models.resnet34(pretrained=True)
+    model.eval()
+
+    transform = transforms.Compose(
+        [
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
+
+    image_loader = ImageLoader("./maxvit_dataset", transform)
+
+    how_many_samples = 50
+    th_cov_val = 0.75
+    value_cov_th = 0.75
+    top_k_val = 3
+    node_intervals = [(0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5)]
+
+    analyzer = Analyzer(
+        model,
+        image_loader,
+        how_many_samples,
+        th_cov_val,
+        value_cov_th,
+        top_k_val,
+        node_intervals,
+        False,
+    )
+    analyzer.analyze()
+
+
 def analyze_resnet50():
     model = models.resnet50(pretrained=True)
     model.eval()
@@ -123,6 +191,40 @@ def analyze_resnet50():
 
 def analyze_resnet101():
     model = models.resnet101(pretrained=True)
+    model.eval()
+
+    transform = transforms.Compose(
+        [
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
+
+    image_loader = ImageLoader("./maxvit_dataset", transform)
+
+    how_many_samples = 5
+    th_cov_val = 0.75
+    value_cov_th = 0.75
+    top_k_val = 3
+    node_intervals = [(0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5)]
+
+    analyzer = Analyzer(
+        model,
+        image_loader,
+        how_many_samples,
+        th_cov_val,
+        value_cov_th,
+        top_k_val,
+        node_intervals,
+        False,
+    )
+    analyzer.analyze()
+
+
+def analyze_resnet152():
+    model = models.resnet152(pretrained=True)
     model.eval()
 
     transform = transforms.Compose(
@@ -193,8 +295,11 @@ def main():
     # analyze_neural_network()
     # analyze_maxvit()
     # analyze_alexnet()
+    # analyze_resnet18()
+    # analyze_resnet34()
     # analyze_resnet50()
-    analyze_resnet101()
+    # analyze_resnet101()
+    analyze_resnet152()
 
 
 if __name__ == "__main__":
