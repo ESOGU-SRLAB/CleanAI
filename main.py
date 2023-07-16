@@ -36,7 +36,7 @@ def analyze_neural_network():
     )
     image_loader = ImageLoader("./test", transform)
 
-    how_many_samples = 5
+    how_many_samples = 50
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
@@ -68,7 +68,7 @@ def analyze_maxvit():
 
     image_loader = ImageLoader("./maxvit_dataset", transform)
 
-    how_many_samples = 5
+    how_many_samples = 50
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
@@ -170,7 +170,7 @@ def analyze_resnet50():
 
     image_loader = ImageLoader("./maxvit_dataset", transform)
 
-    how_many_samples = 5
+    how_many_samples = 50
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
@@ -204,7 +204,7 @@ def analyze_resnet101():
 
     image_loader = ImageLoader("./maxvit_dataset", transform)
 
-    how_many_samples = 5
+    how_many_samples = 50
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
@@ -238,7 +238,7 @@ def analyze_resnet152():
 
     image_loader = ImageLoader("./maxvit_dataset", transform)
 
-    how_many_samples = 5
+    how_many_samples = 50
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
@@ -272,7 +272,7 @@ def analyze_alexnet():
 
     image_loader = ImageLoader("./maxvit_dataset", transform)
 
-    how_many_samples = 5
+    how_many_samples = 50
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
