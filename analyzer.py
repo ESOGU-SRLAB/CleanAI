@@ -5,6 +5,15 @@ from driver import Driver
 from print_utils import PDFWriter
 from image_loader import ImageLoader
 
+"""
+Overview: This class enables the necessary output values to be created by 
+running the class named Driver for the analysis outputs of the model, and 
+saving these output values to the PDF file by using the class named PDFWriter.
+
+Maintainers: - Osman Çağlar - cglrr.osman@gmail.com
+             - Abdul Hannan Ayubi - abdulhannanayubi38@gmail.com
+"""
+
 
 class Analyzer:
     def __init__(
@@ -41,6 +50,15 @@ class Analyzer:
             self.samples.append(sample)
 
     def analyze(self):
+        """
+        It calls the necessary functions from the Driver class, generates the output values,
+        and saves the output values to the PDF file using the PDFWriter class.
+
+        Args:
+            None
+        Returns:
+            None
+        """
         self.pdf_writer.add_text("CleanAI Analysis Report", font_size=20, is_bold=True)
 
         # Save model informations to PDF

@@ -10,6 +10,8 @@ from image_loader import ImageLoader
 
 
 class NeuralNetwork(nn.Module):
+    # Burda modeli tanımlıyoruz. Eğer model yerel makine üzerinden yüklenecekse
+    # model tanımına ihtiyaç bulunmaktadır.
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
@@ -28,19 +30,37 @@ class NeuralNetwork(nn.Module):
 
 
 def analyze_neural_network():
+    # Bu fonksiyon herhangi bir modelin nasıl analiz edileceğini göstermektedir.
+    # Burada bulunan işlemler direk 'main()' fonksiyonu içerisinde de tanımlanabilirdi.
+    # Fakat kodun okunabilirliği açısından bu şekilde bir yapı tercih edilmiştir.
+    # Fonksiyon içerisinde modelin yüklenmesi, veri setinin uygun hale getirilebilmesi için
+    # transform değişkeninin tanımlanması ve analiz işlemleri esnasında kullanılacak parametre
+    # değerlerinin tanımlanması işlemleri yapılmaktadır.
     model = NeuralNetwork()
-    model = torch.load("./model_fashion_1.pth")
+    model = torch.load("./model_fashion_1.pth")  # Modelin yüklenmesi
 
+    # 'transform' değişkeninin tanımlanması modelden modele ve veri setinden veri setine farklılık
+    # gösterebilmektedir. Bu yüzden her model için ayrı ayrı tanımlanması gerekmektedir.
+    # Burada bulunan transform değişkeni MNIST veri seti için tanımlanmıştır.
+    # Veri seti ve model için uygun olan 'transform' değişkeninin tanımlanması için
+    # modele ait dökümantasyonun incelenmesi ve tavsiye edilen değişkenin kullanılması
+    # gerekmektedir.
     transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
-    )
-    image_loader = ImageLoader("./test", transform)
+    )  # Veri setinin uygun hale getirilmesi için transform değişkeninin tanımlanması
+    image_loader = ImageLoader("./test", transform)  # Veri setinin yüklenmesi
 
     how_many_samples = 5
     th_cov_val = 0.75
     value_cov_th = 0.75
     top_k_val = 3
-    node_intervals = [(0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5)]
+    node_intervals = [
+        (0, 0.1),
+        (0.1, 0.2),
+        (0.2, 0.3),
+        (0.3, 0.4),
+        (0.4, 0.5),
+    ]  # Analiz işlemleri esnasında kullanılacak parametre değerlerinin tanımlanması
 
     analyze = Analyzer(
         model,
@@ -50,7 +70,7 @@ def analyze_neural_network():
         value_cov_th,
         top_k_val,
         node_intervals,
-    )
+    )  # Analyzer sınıfının çağırılması
     analyze.analyze()
 
 

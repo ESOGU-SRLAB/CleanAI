@@ -5,6 +5,17 @@ from activation_functions import ActivationFunctions
 from torchviz import make_dot
 import copy
 
+"""
+Overview: The purpose of this class is to record the general information of the 
+analyzed model. This information includes information such as the total number 
+of parameters found in the model, the total number of layers, which activation 
+function is used in each layer, what are the values after the activation function 
+for the neurons in that layer.
+
+Maintainers: - Osman Çağlar - cglrr.osman@gmail.com
+             - Abdul Hannan Ayubi - abdulhannanayubi38@gmail.com
+"""
+
 
 def is_iterable(obj):
     try:
@@ -16,8 +27,17 @@ def is_iterable(obj):
 
 class NeuralNetworkProfiler:
     @staticmethod
-    # This function is no longer in use. It can be removed later!
     def get_layer_names(model):
+        """
+        This function is no longer in use. It can be removed later!
+
+        This function records and returns information about which activation function is used in the layers in the model.
+
+        Args:
+            model (torch.nn.Module): Model whose layer information will be recorded.
+        Returns:
+            model_layers_arr (list): List of the layers in the model.
+        """
         model_layers_arr = []
 
         for name, layer in model._modules.items():
@@ -30,8 +50,10 @@ class NeuralNetworkProfiler:
         return model_layers_arr
 
     @staticmethod
-    # This function is no longer in use. It can be removed later!
     def run_model_with_array(input, model_layers_arr):
+        """
+        This function is no longer in use. It can be removed later!
+        """
         for layer in model_layers_arr:
             layer_result = layer(input)
             print(layer_result)
@@ -39,6 +61,16 @@ class NeuralNetworkProfiler:
 
     @staticmethod
     def get_model_info(model):
+        """
+        This function records and returns general information about the model. This
+        information includes information such as the total number of parameters
+        found in the model, name of the model, total number of layers etc.
+
+        Args:
+            model (torch.nn.Module): Model whose general information will be recorded.
+        Returns:
+            model_info (dict): Dictionary that contains the general information of the model.
+        """
         model_info = {}
 
         # Modelin adını ve türünü kaydetme
@@ -68,6 +100,17 @@ class NeuralNetworkProfiler:
 
     @staticmethod
     def get_activation_info(model, test_input):
+        """
+        This function records and returns information about which activation function is
+        used in the layers in the model. It also records the values after the activation
+        function for the neurons in that layer.
+
+        Args:
+            model (torch.nn.Module): Model whose activation information will be recorded.
+            test_input (numpy.ndarray): Input that will be used to run the model.
+        Returns:
+            activation_info (dict): Dictionary that contains the activation information of the model.
+        """
         model = copy.deepcopy(model)
 
         # Aktivasyon bilgilerini depolamak için bir dictionary oluşturun
@@ -113,6 +156,16 @@ class NeuralNetworkProfiler:
 
     @staticmethod
     def get_activation_infos_for_multiple_inputs(model, test_inputs):
+        """
+        This function is prepared to run the function named 'get_activation_info' for more
+        than one input. It performs the same functions for more than one input.
+
+        Args:
+            model (torch.nn.Module): Model whose activation information will be recorded.
+            test_inputs (list): List of the inputs that will be used to run the model.
+        Returns:
+            activation_info_for_multiple_inputs (list): List of the activation information of the model.
+        """
         activation_info_for_multiple_inputs = []
 
         for test_input in test_inputs:
@@ -124,8 +177,12 @@ class NeuralNetworkProfiler:
         return activation_info_for_multiple_inputs
 
     @staticmethod
-    # This function is no longer in use. It can be removed later!
     def get_model_architecture_dict_of_input(input, model_layers_arr):
+        """
+        This function is no longer in use. It can be removed later!
+        This function is the non-generic version of the 'get_activation_info' function.
+        No longer used!
+        """
         model_architecture_dict_of_input = {}  # initializing the model architecture
         index = 0
 
@@ -156,8 +213,10 @@ class NeuralNetworkProfiler:
         return model_architecture_dict_of_input  # return the model architecture
 
     @staticmethod
-    # This function is no longer in use. It can be removed later!
     def get_model_architecture_dicts_of_inputs(inputs, model_layers_arr):
+        """
+        # This function is no longer in use. It can be removed later!
+        """
         model_architecture_dicts_of_inputs = []
 
         for input in inputs:
@@ -172,6 +231,17 @@ class NeuralNetworkProfiler:
 
     @staticmethod
     def get_counter_dict_of_model(model, test_input):
+        """
+        The purpose of this function is to create a dictionary structure to record
+        the number of times each neuron is activated in case the model is run for
+        more than one test input.
+
+        Args:
+            model (torch.nn.Module): Model whose activation information will be recorded.
+            test_input (numpy.ndarray): Input that will be used to run the model.
+        Returns:
+            counter_dict (dict): Dictionary to prepare to save the number of times each neuron is activated.
+        """
         model = copy.deepcopy(model)
 
         # Aktivasyon bilgilerini depolamak için bir dictionary oluşturun
