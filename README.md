@@ -62,7 +62,7 @@ pip install -r requirements.txt
 First, save your model that you have prepared using PyTorch. This model can be found in another directory and add the saved model to the main directory within the CleanAI project.
 
 **_How to save a prepared model using PyTorch? (Ref: [PyTorch Tutorials](https://pytorch.org/tutorials/))_**
-```
+```python
 torch.save(model, PATH)
 ```
 The 'model' variable specifies your model object, and the 'PATH' variable specifies where you want to save the model.
@@ -75,7 +75,7 @@ In the next step, the class definition of the model must be given in the 'main.p
 
 
 
-```
+```python
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
@@ -94,7 +94,7 @@ class NeuralNetwork(nn.Module):
         return logits
 ```
 
-```
+```python
 model = NeuralNetwork()
 model = torch.load("./test_model.pth")
 ```
@@ -103,7 +103,7 @@ model = torch.load("./test_model.pth")
 
 If the model is to be loaded from the Torch Hub rather than from the local directory, the following lines of code should be followed. The following code block shows how to load the ResNet18 model as an example.
 
-```
+```python
 import torch
 
 model = torch.hub.load('pytorch/vision:v0.9.0', 'resnet18', pretrained=True)
@@ -116,7 +116,7 @@ The image below shows the data set in the CleanAI project main directory, which 
 ![Directory of test entries to be given to the model](https://i.ibb.co/FYSRNSC/Screenshot-2023-06-20-113935.png "Directory of test entries to be given to the model")
 
 
-```
+```python
 transform = transforms.Compose(
     [transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))])
@@ -128,7 +128,7 @@ At this stage, we would like to remind you that the definition of the variable n
 
 In the next step, it is necessary to determine the parameters to be given to the CleanAI library. The 'how_many_samples' parameter will calculate how many inputs will be taken into account during the calculation of the average coverage values, the 'th_cov_val' parameter will be the threshold value during the calculation of the threshold coverage metric, the 'value_cov_th' expression will be the threshold value during the calculation of the value coverage metric, the 'top_k_val' parameter will be the top-k During the calculation of the value coverage value, the 'k' value indicates how much the 'node_intervals' value will be, which threshold value ranges will be taken into account during the calculation of the multisection neuron coverage metric, and the last parameter passed to the 'Analyzer' is whether the SS & SV & VS & VV metrics will be calculated.
 
-```
+```python
 how_many_samples = 5
 th_cov_val = 0.75
 value_cov_th = 0.75
@@ -152,7 +152,7 @@ By calling the function named 'analyze' in 'Analyzer', the production of the ana
 
 The final code in 'main.py' should be as follows. (Parameters should be adjusted according to the user.)
 
-```
+```python
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
