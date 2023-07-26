@@ -10,8 +10,8 @@ from image_loader import ImageLoader
 
 
 class NeuralNetwork(nn.Module):
-    # Burda modeli tanımlıyoruz. Eğer model yerel makine üzerinden yüklenecekse
-    # model tanımına ihtiyaç bulunmaktadır.
+    # Here we define the model. If the model is to be loaded from the local
+    # machine, the model definition is needed.
     def __init__(self):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
@@ -30,25 +30,24 @@ class NeuralNetwork(nn.Module):
 
 
 def analyze_neural_network():
-    # Bu fonksiyon herhangi bir modelin nasıl analiz edileceğini göstermektedir.
-    # Burada bulunan işlemler direk 'main()' fonksiyonu içerisinde de tanımlanabilirdi.
-    # Fakat kodun okunabilirliği açısından bu şekilde bir yapı tercih edilmiştir.
-    # Fonksiyon içerisinde modelin yüklenmesi, veri setinin uygun hale getirilebilmesi için
-    # transform değişkeninin tanımlanması ve analiz işlemleri esnasında kullanılacak parametre
-    # değerlerinin tanımlanması işlemleri yapılmaktadır.
+    # This function shows how to analyze any model. The operations found here could
+    # also be defined directly within the 'main()' function. However, such a structure
+    # was preferred for the readability of the code. Loading the model in the function,
+    # defining the transform variable in order to make the data set suitable, and defining
+    # the parameter values to be used during the analysis processes are performed.
     model = NeuralNetwork()
     model = torch.load("./model_fashion_1.pth")  # Modelin yüklenmesi
 
-    # 'transform' değişkeninin tanımlanması modelden modele ve veri setinden veri setine farklılık
-    # gösterebilmektedir. Bu yüzden her model için ayrı ayrı tanımlanması gerekmektedir.
-    # Burada bulunan transform değişkeni MNIST veri seti için tanımlanmıştır.
-    # Veri seti ve model için uygun olan 'transform' değişkeninin tanımlanması için
-    # modele ait dökümantasyonun incelenmesi ve tavsiye edilen değişkenin kullanılması
-    # gerekmektedir.
+    # The definition of the 'transform' variable may differ from model to model and
+    # dataset to dataset. Therefore, it must be defined separately for each model.
+    # The transform variable found here is defined for the MNIST dataset. In order
+    # to define the 'transform' variable suitable for the data set and the model,
+    # the documentation of the model should be examined and the recommended variable
+    # should be used.
     transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
-    )  # Veri setinin uygun hale getirilmesi için transform değişkeninin tanımlanması
-    image_loader = ImageLoader("./test", transform)  # Veri setinin yüklenmesi
+    )  # Defining the transform variable to optimize the dataset
+    image_loader = ImageLoader("./test", transform)  # Loading the dataset
 
     how_many_samples = 50
     th_cov_val = 0.75
@@ -60,7 +59,7 @@ def analyze_neural_network():
         (0.2, 0.3),
         (0.3, 0.4),
         (0.4, 0.5),
-    ]  # Analiz işlemleri esnasında kullanılacak parametre değerlerinin tanımlanması
+    ]  # Defining parameter values to be used during analysis processes
 
     analyze = Analyzer(
         model,
@@ -70,7 +69,7 @@ def analyze_neural_network():
         value_cov_th,
         top_k_val,
         node_intervals,
-    )  # Analyzer sınıfının çağırılması
+    )  # Calling the Analyzer class
     analyze.analyze()
 
 
@@ -80,7 +79,7 @@ def analyze_maxvit():
 
     transform = transforms.Compose(
         [
-            transforms.Resize((224, 224)),  # Görüntü boyutunu yeniden şekillendir
+            transforms.Resize((224, 224)),  # Reshape image size
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]

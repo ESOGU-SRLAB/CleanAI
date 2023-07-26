@@ -25,19 +25,19 @@ class PrintUtils:
         Returns:
             None
         """
-        # Hücre genişliklerini hesapla
+        # Calculate cell widths
         max_col_widths = [
             max(len(str(data[i][j])) for i in range(len(data)))
             for j in range(len(column_headers))
         ]
 
-        # Sütun başlıklarının genişliğini ayarla
+        # Set the width of the column headers
         col_header_widths = [
             max(len(header), max_col_widths[i])
             for i, header in enumerate(column_headers)
         ]
 
-        # Sütun başlıklarını yazdır (kalın/bold)
+        # Print column headers (bold/bold)
         header_row = (
             "\033[1m"
             + "\t"
@@ -53,12 +53,12 @@ class PrintUtils:
 
         longest_header_length = len(header_row.expandtabs())
 
-        # Kısa çizgiyi yazdır (kalın/bold)
+        # Print the hyphen (bold/bold)
         print("\033[1m" + "-" * (longest_header_length) + "\033[0m")
 
-        # Satırları ve değerleri yazdır
+        # Print rows and values
         for row_header, row_data in zip(row_headers, data):
-            # Satır başlığını yazdır (kalın/bold)
+            # Print row header (bold/bold)
             print(
                 "\033[1m"
                 + row_header.ljust(max(col_header_widths))
@@ -67,14 +67,14 @@ class PrintUtils:
                 end="",
             )
 
-            # Değerleri yazdır
+            # Print values
             for i, value in enumerate(row_data):
                 cell_width = col_header_widths[i]
                 print(str(value).ljust(cell_width), end="\t|\t")
 
             print()
 
-            # Kısa çizgiyi yazdır (kalın/bold)
+            # Print the hyphen (bold/bold)
             print("\033[1m" + "-" * (longest_header_length) + "\033[0m")
 
 

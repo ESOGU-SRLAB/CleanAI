@@ -73,14 +73,14 @@ class NeuralNetworkProfiler:
         """
         model_info = {}
 
-        # Modelin adını ve türünü kaydetme
+        # Saving the model's name and type
         model_info["name"] = type(model).__name__
 
-        # Modelin parametre sayısını kaydetme
+        # Saving the number of parameters of the model
         total_params = sum(p.numel() for p in model.parameters())
         model_info["total_params"] = total_params
 
-        # Modelin katmanlarını ve katman sayısını kaydetme
+        # Saving the layers of the model and the number of layers
         layers = []
         num_layers = 0
         for name, module in model.named_modules():
@@ -90,7 +90,7 @@ class NeuralNetworkProfiler:
         model_info["layers"] = layers
         model_info["num_layers"] = num_layers
 
-        # Modelin optimizer ve kayıp fonksiyonunu kaydetme (varsa)
+        # Save the model's optimizer and loss function (if any)
         if hasattr(model, "optimizer"):
             model_info["optimizer"] = type(model.optimizer).__name__
         if hasattr(model, "criterion"):
@@ -113,10 +113,10 @@ class NeuralNetworkProfiler:
         """
         model = copy.deepcopy(model)
 
-        # Aktivasyon bilgilerini depolamak için bir dictionary oluşturun
+        # Create a dictionary to store the activation information
         activation_info = {}
 
-        # Hook fonksiyonunu tanımlayın
+        # Define the hook function
         def save_activation(consecutive_index, layer_index):
             def hook(module, input, output):
                 activation_info[str(consecutive_index)] = {
@@ -129,7 +129,7 @@ class NeuralNetworkProfiler:
             return hook
 
         activation_functions = ActivationFunctions.get_activation_functions()
-        # Aktivasyon fonksiyonlarına hook'u ekleyin
+        # Add hook to activation functions
         consecutive_index = 0
         for layer_index, module in enumerate(model.modules()):
             if any(
@@ -144,12 +144,11 @@ class NeuralNetworkProfiler:
                 )
                 consecutive_index += 1
 
-        # Girdi tensörünü oluşturun
+        # Create the input tensor
         input_tensor = torch.tensor(test_input)
 
-        # İleri geçişi yapın
-        model.eval()  # Modeli değerlendirme moduna getirin
-        with torch.no_grad():  # Gradyan hesaplamalarını devre dışı bırakın
+        model.eval()  # Put the model in evaluation mode
+        with torch.no_grad():  # Disable gradient calculations
             output = model(input_tensor)
 
         return activation_info
@@ -244,10 +243,10 @@ class NeuralNetworkProfiler:
         """
         model = copy.deepcopy(model)
 
-        # Aktivasyon bilgilerini depolamak için bir dictionary oluşturun
+        # Create a dictionary to store the activation information
         activation_info = {}
 
-        # Hook fonksiyonunu tanımlayın
+        # Define the hook function
         def save_activation(consecutive_index, layer_index):
             def hook(module, input, output):
                 activation_info[str(consecutive_index)] = {
@@ -261,7 +260,7 @@ class NeuralNetworkProfiler:
             return hook
 
         activation_functions = ActivationFunctions.get_activation_functions()
-        # Aktivasyon fonksiyonlarına hook'u ekleyin
+        # Add hook to activation functions
         consecutive_index = 0
         for layer_index, module in enumerate(model.modules()):
             if any(
@@ -276,12 +275,11 @@ class NeuralNetworkProfiler:
                 )
                 consecutive_index += 1
 
-        # Girdi tensörünü oluşturun
+        # Create the input tensor
         input_tensor = torch.tensor(test_input)
 
-        # İleri geçişi yapın
-        model.eval()  # Modeli değerlendirme moduna getirin
-        with torch.no_grad():  # Gradyan hesaplamalarını devre dışı bırakın
+        model.eval()  # Put the model in evaluation mode
+        with torch.no_grad():  # Disable gradient calculations
             output = model(input_tensor)
 
         return activation_info
