@@ -59,6 +59,8 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+
+### If you're dealing with a model on the local machine:
 First, save your model that you have prepared using PyTorch. This model can be found in another directory and add the saved model to the main directory within the CleanAI project.
 
 **_How to save a prepared model using PyTorch? (Ref: [PyTorch Tutorials](https://pytorch.org/tutorials/))_**
@@ -99,15 +101,9 @@ model = NeuralNetwork()
 model = torch.load("./test_model.pth")
 ```
 
-**_If the model is to be uploaded via Torch Hub:_**
+Here, the string value passed as a parameter to the 'torch.load' function shows the directory where the model is located.
 
-If the model is to be loaded from the Torch Hub rather than from the local directory, the following lines of code should be followed. The following code block shows how to load the ResNet18 model as an example.
 
-```python
-import torch
-
-model = torch.hub.load('pytorch/vision:v0.9.0', 'resnet18', pretrained=True)
-```
 
 In the next stage, the preparation of the data set and transformer to be given to the model comes.
 
@@ -205,6 +201,78 @@ python main.py
 After the processes are completed, a file named 'Analysis_[MODEL_NAME].pdf' will be created with analysis outputs.
 
 ![Report with analysis outputs](https://i.ibb.co/PNxrTwJ/Screenshot-2023-06-20-115928.png "Report with analysis outputs")
+
+### If the model is to be loaded from a repository such as Torch Hub:
+
+If the model is to be loaded from the Torch Hub rather than from the local directory, the following lines of code should be followed. The following code block shows how to load the ResNet18 model as an example.
+
+```python
+import torch
+
+model = torch.hub.load('pytorch/vision:v0.9.0', 'resnet18', pretrained=True)
+```
+
+The first parameter passed to the 'torch.hub.load' function indicates in which directory the model is located in the remote repository, the second parameter indicates how the model is named, and the 'pretrained' parameter indicates whether the model will use predetermined weights.
+
+After the model is loaded, the data set of the model should be included in the project folder. The steps at this stage are the same as those described in the 'If you're dealing with a model on the local machine' topic.
+
+The test input data of the model should be collected under a folder and placed in the project main directory.
+
+![ResNet-18 dataset in project main directory](https://i.ibb.co/ynkLVKT/Screenshot-2023-07-31-173920.png "ResNet-18 dataset in project main directory")
+
+As seen in the image above, which test inputs you want to work with during the analysis of the model, these test inputs should be collected under a folder (in the example: 'resnet18_dataset' folder) as images with .png, .jpg or .jpeg extensions. NOTE: If there are extra folders/nested folders in the data set folder, all folders will be scanned and all the images in it will be added to the data set to be used.
+
+```python
+
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),  # Resize image to desired size
+    transforms.ToTensor(),  # Convert image to Tensor
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),  # Normalization
+])
+    
+image_loader = ImageLoader("./resnet18_dataset", transform)
+```
+
+At this stage, again, we would like to remind you that the definition of the variable named 'transform', which is passed as a parameter to the 'ImageLoader' class, will differ from model to model. For this, we recommend examining the documentation of the model in order to define the 'transform' variable suitable for the model to be tested and making the definition of 'transform' suitable for the model. It is important to do this step carefully in order to properly adjust the input data set to be given to the model during the analysis of the model.
+
+```python
+import torch
+
+model = torch.hub.load('pytorch/vision:v0.9.0', 'resnet18', pretrained=True) # Load model from hub
+
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),  # Resize image to desired size
+    transforms.ToTensor(),  # Convert image to Tensor
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),  # Normalization
+])
+    
+image_loader = ImageLoader("./resnet18_dataset", transform) # Load dataset to be used in analysis phase
+
+# Define the parameters
+how_many_samples = 5
+th_cov_val = 0.75
+value_cov_th = 0.75
+top_k_val = 3
+node_intervals = [(0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5)]
+
+analyze = Analyzer(
+    model,
+    image_loader,
+    how_many_samples,
+    th_cov_val,
+    value_cov_th,
+    top_k_val,
+    node_intervals,
+)
+analyzer.analyze()
+```
+
+Above is an example code block of how the 'main' function will look. There is a sample code block on how to load the model from the hub, how to define the 'transform' variable, how to load the data set in the project main directory, how to determine the parameters to be used during the analysis (which parameter is used for what in the upper section), and how to start the analysis process. 
+
+After all these processes, a file with the same name as your model (Analysis_[ModelName].pdf) in which the output values are saved will be produced in the project main directory.
+
+![Report with analysis outputs](https://i.ibb.co/PNxrTwJ/Screenshot-2023-06-20-115928.png "Report with analysis outputs")
+
 
 ## Collobrators
 You can access the social media accounts of our teammates who supported the development phase from the links below.
