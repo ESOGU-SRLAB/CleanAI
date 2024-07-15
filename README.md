@@ -8,11 +8,11 @@
 
 The document includes the following titles:
 
-- [What is CleanAI](#whatiscleanai)
-- [Coverage Metrics](#coveragemetrics)
+- [What is CleanAI](#what-is-cleanai)
+- [Coverage Metrics](#coverage-metrics)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Sample Analysis Reports](#sampleanalysisreports)
+- [Sample Analysis Reports (Case Study and Output Results on Different ResNet Models)](#sample-analysis-reports-case-study-and-output-results-on-different-resnet-models)
 - [Collobrators](#collobrators)
 - [Credits](#credits)
 - [License](#license)
